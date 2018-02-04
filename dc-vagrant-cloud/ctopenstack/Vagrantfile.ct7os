@@ -5,11 +5,14 @@
 
 $pack = <<SCRIPT
 
-if [ `ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|head -2|wc -l` = 2 ];then
+numif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|head -2|wc -l`
+
+if [ $numif = 2 ];then
     natif=`ls -ltr|grep ifcfg|grep -v ifcfg-lo|head -1|awk '{print $9}'|cut -d'-' -f2`
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
     hoif=`ls -ltr|grep ifcfg|grep -v ifcfg-lo|head -2|tail -1|awk '{print $9}'|cut -d'-' -f2`
     hoip=`ip addr show $hoif|grep $hoif|grep global|awk '{print $2}'|cut -d/ -f1`
+    
     sed -i "/$natip/s/$natip/$hoip/g" latest_packstack.conf
 
     packstack --answer-file latest_packstack.conf
