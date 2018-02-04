@@ -30,6 +30,4 @@ sed -i '/CONFIG_SWIFT_INSTALL=/c CONFIG_SWIFT_INSTALL=n' latest_packstack.conf
  
 packstack --answer-file latest_packstack.conf
 
-cp  /root/keystonerc_admin /home/vagrant
-cp  /root/keystonerc_demo /home/vagrant
-chown vagrant:vagrant /home/vagrant/keystonerc*
+
