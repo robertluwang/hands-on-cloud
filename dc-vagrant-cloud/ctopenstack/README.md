@@ -72,6 +72,19 @@ launch using ct7os box:
 - 2nd NIC: hostonly private network  10.120.0.21
 ```
 vagrant up
-vagrant ssh
 ```
-the centos openstack vm node ready for you.
+sometimes it is hanging at stage:
+```
+==> ctstack: Setting hostname...
+==> ctstack: Configuring and enabling network interfaces...
+```
+opened [issue](https://github.com/hashicorp/vagrant/issues/9443) here, as quickly remedy:
+```
+- ctrl-c to stop "vagrant up" when it is hanging
+- power off vm from virtualbox GUI or CLI since "vagrant halt" also will take long time
+- run "vagrant up" again it will start 2nd interface easily
+```
+
+
+
+
