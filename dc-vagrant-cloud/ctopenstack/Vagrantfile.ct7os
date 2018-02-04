@@ -1,0 +1,35 @@
+# Vagrantfile
+# launch a centos7 based openstack sandbox using ct7os box
+# By Robert Wang @github.com/robertluwang
+# Feb 4th, 2018
+
+$pack = <<SCRIPT
+
+if [ `ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|head -2|wc -l` = 2 ];then
+    natif=`ls -ltr|grep ifcfg|grep -v ifcfg-lo|head -1|awk '{print $9}'|cut -d'-' -f2`
+    natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
+    hoif=`ls -ltr|grep ifcfg|grep -v ifcfg-lo|head -2|tail -1|awk '{print $9}'|cut -d'-' -f2`
+    hoip=`ip addr show $hoif|grep $hoif|grep global|awk '{print $2}'|cut -d/ -f1`
+    sed -i "/$natip/s/$natip/$hoip/g" latest_packstack.conf
+
+    packstack --answer-file latest_packstack.conf
+fi
+
+SCRIPT
+
+Vagrant.configure("2") do |config|
+    config.vm.box="dreamcloud/ct7os"
+    config.ssh.insert_key = false
+    config.vm.box_check_update = false
+
+    config.vm.define "ctstack" do |ct7|
+        ct7.vm.hostname = "ctstack"
+        ct7.vm.network :private_network, ip: "10.120.0.21"
+        ct7.vm.provision "shell", inline: $pack, privileged: true
+
+        ct7.vm.provider :virtualbox do |vb|
+            vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
+            vb.name="ctstack"
+        end
+    end
+end
