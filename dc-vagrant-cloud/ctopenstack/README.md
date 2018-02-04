@@ -56,3 +56,22 @@ vagrant up
 vagrant ssh
 ```
 the centos openstack vm node ready for you.
+
+## launch centos openstack vm node using ct7os box
+this is centos7 based openstack sandbox, download Vagrantfile,
+```
+mkdir -p vagrant/ctopenstack
+cd vagrant/ctopenstack
+curl -Lo Vagrantfile https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/ctopenstack/Vagrantfile.ct7os
+```
+launch using ct7os box:
+- hostname: ctopenstack
+- memory: 8GB
+- cpu: 2
+- 1st NIC: NAT
+- 2nd NIC: hostonly private network  10.120.0.21
+```
+vagrant up
+vagrant ssh
+```
+the centos openstack vm node ready for you.
