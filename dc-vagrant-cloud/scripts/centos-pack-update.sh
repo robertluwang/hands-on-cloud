@@ -8,8 +8,10 @@ numif=`ip link |grep BROADCAST|cut -d: -f2|head -2|wc -l`
 
 if [ $numif = 2 ];then
     natif=`ip link |grep BROADCAST|cut -d: -f2|head -1`
+    natif="$(echo -e "${natif}" | sed -e 's/^[[:space:]]*//')"
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
     hoif=`ip link |grep BROADCAST|cut -d: -f2|head -2|tail -1`
+    hoif="$(echo -e "${hoif}" | sed -e 's/^[[:space:]]*//')"
     hoip=`ip addr show $hoif|grep $hoif|grep global|awk '{print $2}'|cut -d/ -f1`
     
     sed -i "/$natip/s/$natip/$hoip/g" latest_packstack.conf
