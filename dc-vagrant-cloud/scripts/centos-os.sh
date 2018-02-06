@@ -28,6 +28,6 @@ sed -i '/CONFIG_KEYSTONE_ADMIN_PW=/c CONFIG_KEYSTONE_ADMIN_PW=demo' latest_packs
 sed -i '/CONFIG_KEYSTONE_DEMO_PW=/c CONFIG_KEYSTONE_DEMO_PW=demo' latest_packstack.conf
 sed -i '/CONFIG_SWIFT_INSTALL=/c CONFIG_SWIFT_INSTALL=n' latest_packstack.conf
  
-packstack --answer-file latest_packstack.conf
+packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
 
 
