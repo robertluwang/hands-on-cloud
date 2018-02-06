@@ -26,6 +26,7 @@ RABBIT_PASSWORD=\$ADMIN_PASSWORD
 SERVICE_PASSWORD=\$ADMIN_PASSWORD
 HOST_IP_IFACE=$natif
 HOST_IP=$natip
+GIT_BASE=${GIT_BASE:-https://git.openstack.org}
 EOF
 
 # run devstack
