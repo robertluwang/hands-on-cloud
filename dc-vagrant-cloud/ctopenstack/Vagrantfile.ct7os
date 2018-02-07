@@ -9,9 +9,9 @@ nics=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|awk '{p
 numif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|awk '{print $9}'|cut -d\- -f2|head -2|wc -l`
 
 if [ $numif = 2 ];then
-    natif=`hoif=`echo $nics|awk '{print $1}'``
+    natif=`echo $nics|awk '{print $1}'`
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
-    hoif=`hoif=`echo $nics|awk '{print $2}'``
+    hoif=`echo $nics|awk '{print $2}'`
     hoip=`ip addr show $hoif|grep $hoif|grep global|awk '{print $2}'|cut -d/ -f1`
     
     sed -i "/$natip/s/$natip/$hoip/g" latest_packstack.conf
