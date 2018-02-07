@@ -1,17 +1,16 @@
 #!/bin/sh
 # centos-pack-update.sh
-# centos base openstack box packstack ip date script for packer
+# centos base openstack box packstack ip update script for packer
 # Robert Wang @github.com/robertluwang
 # Feb 5th, 2018
 
-numif=`ip link |grep BROADCAST|cut -d: -f2|head -2|wc -l`
+nics=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|awk '{print $9}'|cut -d\- -f2|head -2`
+numif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|awk '{print $9}'|cut -d\- -f2|head -2|wc -l`
 
 if [ $numif = 2 ];then
-    natif=`ip link |grep BROADCAST|cut -d: -f2|head -1`
-    natif="$(echo -e "${natif}" | sed -e 's/^[[:space:]]*//')"
+    natif=`hoif=`echo $nics|awk '{print $1}'``
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
-    hoif=`ip link |grep BROADCAST|cut -d: -f2|head -2|tail -1`
-    hoif="$(echo -e "${hoif}" | sed -e 's/^[[:space:]]*//')"
+    hoif=`hoif=`echo $nics|awk '{print $2}'``
     hoip=`ip addr show $hoif|grep $hoif|grep global|awk '{print $2}'|cut -d/ -f1`
     
     sed -i "/$natip/s/$natip/$hoip/g" latest_packstack.conf
