@@ -84,7 +84,22 @@ opened [issue](https://github.com/hashicorp/vagrant/issues/9443) here, as quickl
 - power off vm from virtualbox GUI or CLI since "vagrant halt" also will take long time
 - run "vagrant up" again it will start 2nd interface easily
 ```
-
+## launch centos openstack vm node using ct7os box using external ip update script
+this is centos7 based openstack sandbox, download Vagrantfile,
+```
+mkdir -p vagrant/ctopenstack
+cd vagrant/ctopenstack
+curl -Lo Vagrantfile https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/ctopenstack/Vagrantfile.ct7osbox
+```
+launch using ct7os box:
+- hostname: ctopenstack
+- memory: 8GB
+- cpu: 2
+- 1st NIC: NAT
+- 2nd NIC: hostonly private network  10.120.0.21
+```
+vagrant up
+```
 
 
 
