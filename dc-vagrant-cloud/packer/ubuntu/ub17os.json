@@ -42,6 +42,7 @@
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
       "type": "virtualbox-iso",
+      "post_shutdown_delay": "30s",
       "vboxmanage": [
         [
           "modifyvm",
@@ -77,8 +78,34 @@
       "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
       "expect_disconnect": true,
       "scripts": [
-        "../../scripts/ubuntu-basebox.sh",
-        "../../scripts/ubuntu-os.sh",
+        "../../scripts/ubuntu-basebox.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "environment_vars": [
+        "HOME_DIR=/home/vagrant",
+        "http_proxy={{user `http_proxy`}}",
+        "https_proxy={{user `https_proxy`}}",
+        "no_proxy={{user `no_proxy`}}"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sh -eux '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "../../scripts/ubuntu-os.sh"
+      ],
+      "type": "shell"
+    },
+    {
+      "environment_vars": [
+        "HOME_DIR=/home/vagrant",
+        "http_proxy={{user `http_proxy`}}",
+        "https_proxy={{user `https_proxy`}}",
+        "no_proxy={{user `no_proxy`}}"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
         "../../scripts/ubuntu-vbguest.sh",
         "../../scripts/ubuntu-publickey.sh",
         "../../scripts/ubuntu-cleanup.sh"
@@ -107,5 +134,8 @@
     "version": "TIMESTAMP"
   }
 }
+
+
+
 
 
