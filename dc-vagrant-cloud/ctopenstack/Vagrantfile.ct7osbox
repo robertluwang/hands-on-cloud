@@ -8,14 +8,15 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
     config.vm.box_check_update = false
 
-    config.vm.define "ctstack" do |ct7|
-        ct7.vm.hostname = "ctstack"
-        ct7.vm.network :private_network, ip: "10.120.0.21"
-        ct7.vm.provision "shell", path: "../scripts/centos-pack-update.sh, privileged: true
+    config.vm.define "cttest" do |ct7|
+        ct7.vm.hostname = "cttest"
+        ct7.vm.network :private_network, ip: "10.120.0.22"
+        ct7.vm.provision "shell", path: "../scripts/centos-ovs_config.sh", privileged: true
+        ct7.vm.provision "shell", path: "../scripts/centos-pack-update.sh", privileged: true
 
         ct7.vm.provider :virtualbox do |vb|
             vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-            vb.name="ctstack"
+            vb.name="cttest"
         end
     end
 end
