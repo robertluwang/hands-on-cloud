@@ -58,5 +58,10 @@ then
     sed -i "/^CONFIG_REDIS_HOST=/c CONFIG_REDIS_HOST=$ovsip" latest_packstack.conf
 
     packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+    
+    cp /root/keystonerc_admin /home/vagrant
+    cp /root/keystonerc_demo /home/vagrant
+    chmod vagrant:vagrant /home/vagrant/keystonerc*
+    
 
 fi
