@@ -44,7 +44,7 @@
       "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
         "../../scripts/centos-basebox.sh",
-        "../../scripts/ctos.sh",
+        "../../scripts/centos-os.sh",
         "../../scripts/centos-vbguest.sh",
         "../../scripts/centos-publickey.sh",
         "../../scripts/centos-cleanup.sh"
