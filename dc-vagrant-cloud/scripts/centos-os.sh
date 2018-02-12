@@ -28,7 +28,7 @@ systemctl start openvswitch
 packstack --gen-answer-file=packstack_`date +"%Y-%m-%d"`.conf
 cp packstack_`date +"%Y-%m-%d"`.conf latest_packstack.conf
 
-natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|head -1`
+natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
 natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
 
 osif=$natif
