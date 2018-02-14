@@ -21,9 +21,6 @@ yum update -y
 # step 2 install packstack
 yum install -y openstack-packstack
 
-yum install -y openvswitch
-systemctl start openvswitch
-
 # step3 run packstack
 packstack --gen-answer-file=packstack_`date +"%Y-%m-%d"`.conf
 cp packstack_`date +"%Y-%m-%d"`.conf latest_packstack.conf
@@ -43,8 +40,6 @@ sed -i "/^CONFIG_AMQP_HOST=/c CONFIG_AMQP_HOST=$osip" latest_packstack.conf
 sed -i "/^CONFIG_MARIADB_HOST=/c CONFIG_MARIADB_HOST=$osip" latest_packstack.conf
 sed -i "/^CONFIG_KEYSTONE_LDAP_URL=/c CONFIG_KEYSTONE_LDAP_URL=ldap://$osip" latest_packstack.conf
 sed -i "/^CONFIG_REDIS_HOST=/c CONFIG_REDIS_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_NEUTRON_OVS_TUNNEL_IF=/c CONFIG_NEUTRON_OVS_TUNNEL_IF=$osif" latest_packstack.conf
-sed -i "/^CONFIG_NEUTRON_ML2_VNI_RANGES=/c CONFIG_NEUTRON_ML2_VNI_RANGES=1000:2000" latest_packstack.conf
 
 sed -i '/^CONFIG_DEFAULT_PASSWORD=/c CONFIG_DEFAULT_PASSWORD=demo' latest_packstack.conf
 sed -i '/^CONFIG_KEYSTONE_ADMIN_PW=/c CONFIG_KEYSTONE_ADMIN_PW=demo' latest_packstack.conf
@@ -62,42 +57,4 @@ cp /root/keystonerc_admin /home/vagrant/
 cp /root/keystonerc_demo /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
-# ovs config 
 
-cp /etc/sysconfig/network-scripts/ifcfg-$osif /etc/sysconfig/network-scripts/ifcfg-br-ex
-
-# generate new interface file
-cat <<EOF > /tmp/ifcfg-$osif
-DEVICE=$osif
-ONBOOT=yes
-TYPE=OVSPort
-DEVICETYPE=ovs
-OVS_BRIDGE=br-ex
-EOF
-
-mv /tmp/ifcfg-$osif /etc/sysconfig/network-scripts
-
-# generate ifcfg-br-ex
-os_gw=`route -en|grep UG|awk '{print $2}'`
-os_dns=`cat /etc/resolv.conf|grep nameserver|awk '{print $2}'`
-
-cat <<EOF > /tmp/ifcfg-br-ex
-DEVICE=br-ex
-BOOTPROTO=static
-ONBOOT=yes
-TYPE=OVSBridge
-DEVICETYPE=ovs
-USERCTL=yes
-PEERDNS=yes
-IPV6INIT=no
-IPADDR=$osip
-NETMASK=255.255.255.0
-GATEWAY=$os_gw
-DNS1=$os_dns
-DNS2=8.8.8.8
-EOF
-
-mv /tmp/ifcfg-br-ex /etc/sysconfig/network-scripts
-
-# make ovs br-ex change
-systemctl restart network.service
