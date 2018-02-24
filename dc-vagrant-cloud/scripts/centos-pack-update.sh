@@ -2,7 +2,7 @@
 # centos-pack-update.sh
 # centos base openstack box packstack ip update script for packer
 # Robert Wang @github.com/robertluwang
-# Feb 5th, 2018
+# Feb 24th, 2018
 
 set -x
 
@@ -11,7 +11,7 @@ systemctl start openvswitch
 
 # check how many interface
 nics=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -2`
-numif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|head -2|wc -l`
+numif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -2|wc -l`
 
 # if only one NIC is NAT; if two NICs then pick up 2nd NIC - private network 
 
@@ -46,6 +46,14 @@ fi
 ovsif=$natif
 ovsip=$natip
 
+# update /etc/hosts
+
+sed -i  '/localhost/d' /etc/hosts
+sed -i  '/$osip/d' /etc/hosts
+
+echo "127.0.0.1    lo localhost" | sudo tee -a /etc/hosts
+echo "$osip    "`hostname` |sudo tee -a /etc/hosts
+
 # update latest_packstack.conf
 
 sed -i "/^CONFIG_CONTROLLER_HOST=/c CONFIG_CONTROLLER_HOST=$osip" latest_packstack.conf
@@ -57,20 +65,25 @@ sed -i "/^CONFIG_AMQP_HOST=/c CONFIG_AMQP_HOST=$osip" latest_packstack.conf
 sed -i "/^CONFIG_MARIADB_HOST=/c CONFIG_MARIADB_HOST=$osip" latest_packstack.conf
 sed -i "/^CONFIG_KEYSTONE_LDAP_URL=/c CONFIG_KEYSTONE_LDAP_URL=ldap://$osip" latest_packstack.conf
 sed -i "/^CONFIG_REDIS_HOST=/c CONFIG_REDIS_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_NEUTRON_OVS_TUNNEL_IF=/c CONFIG_NEUTRON_OVS_TUNNEL_IF=$osif" latest_packstack.conf
-sed -i "/^CONFIG_NEUTRON_ML2_VNI_RANGES=/c CONFIG_NEUTRON_ML2_VNI_RANGES=1000:2000" latest_packstack.conf
+
+sed -i "/^CONFIG_NEUTRON_OVS_BRIDGE_IFACES=/c CONFIG_NEUTRON_OVS_BRIDGE_IFACES=br-ex:$ovsif" latest_packstack.conf
+
+sed -i "s/$ipconf/$osip/g" latest_packstack.conf 
+
+echo "CONFIG_NOVA_COMPUTE_PRIVIF=lo" | sudo tee -a latest_packstack.conf
+echo "CONFIG_NOVA_NETWORK_PRIVIF=lo" | sudo tee -a latest_packstack.conf
 
 packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
 
 # update source file
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_admin
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_demo
+#sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_demo
 
 rm /home/vagrant/keystonerc_admin
-rm /home/vagrant/keystonerc_demo
+#rm /home/vagrant/keystonerc_demo
 cp /root/keystonerc_admin /home/vagrant/
-cp /root/keystonerc_demo /home/vagrant/
+#cp /root/keystonerc_demo /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
 # ovs config 
@@ -110,7 +123,14 @@ EOF
 
 mv /tmp/ifcfg-br-ex /etc/sysconfig/network-scripts
 
+cat /etc/hosts|grep "127.0.0.1    lo localhost" > /tmp/hosts.txt
+cat /etc/hosts|grep $osip >> /tmp/hosts.txt
+
+cp /tmp/hosts.txt /etc/hosts
+
 # make ovs br-ex change
 systemctl restart network.service
+
+
 
 
