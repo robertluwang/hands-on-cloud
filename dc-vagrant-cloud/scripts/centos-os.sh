@@ -1,7 +1,7 @@
 #!/bin/bash
 #  centos openstack with packstack provision script for packer  
 #  Robert Wang
-#  Feb 11th, 2018
+#  Feb 24th, 2018
 
 set -x
 
@@ -15,7 +15,6 @@ systemctl start network
 
 # step 1 sw repo
 yum install -y centos-release-openstack-pike openstack-utils
-yum-config-manager --enable openstack-pike
 yum update -y
 
 # step 2 install packstack
@@ -43,18 +42,18 @@ sed -i "/^CONFIG_REDIS_HOST=/c CONFIG_REDIS_HOST=$osip" latest_packstack.conf
 
 sed -i '/^CONFIG_DEFAULT_PASSWORD=/c CONFIG_DEFAULT_PASSWORD=demo' latest_packstack.conf
 sed -i '/^CONFIG_KEYSTONE_ADMIN_PW=/c CONFIG_KEYSTONE_ADMIN_PW=demo' latest_packstack.conf
-sed -i '/^CONFIG_KEYSTONE_DEMO_PW=/c CONFIG_KEYSTONE_DEMO_PW=demo' latest_packstack.conf
+sed -i '/^CONFIG_PROVISION_DEMO=/c CONFIG_PROVISION_DEMO=n' latest_packstack.conf
+sed -i '/^CONFIG_CINDER_INSTALL=/c CONFIG_CINDER_INSTALL=n' latest_packstack.conf
 sed -i '/^CONFIG_SWIFT_INSTALL=/c CONFIG_SWIFT_INSTALL=n' latest_packstack.conf
+sed -i '/^CONFIG_CEILOMETER_INSTALL=/c CONFIG_CEILOMETER_INSTALL=n' latest_packstack.conf
+sed -i '/^CONFIG_NAGIOS_INSTALL=/c CONFIG_NAGIOS_INSTALL=n' latest_packstack.conf
 
 packstack --answer-file latest_packstack.conf  || echo "packstack exited $? and is suppressed."
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_admin
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_demo
 
 rm /home/vagrant/keystonerc_admin
-rm /home/vagrant/keystonerc_demo
 cp /root/keystonerc_admin /home/vagrant/
-cp /root/keystonerc_demo /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
 
