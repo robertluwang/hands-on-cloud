@@ -24,7 +24,7 @@ if [ $numif = 2 ]
 then
     natif=`echo $nics|awk '{print $1}'`
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
-    if [ $natip = '' ];then
+    if [ "$natip" = "" ];then
         natip=`ip addr show br-ex|grep "global dynamic br-ex"|awk '{print $2}'|cut -d/ -f1`
     fi
     hoif=`echo $nics|awk '{print $2}'`
@@ -34,13 +34,13 @@ then
 else
     natif=`echo $nics|awk '{print $1}'`
     natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
-    if [ $natip = '' ];then
+    if [ "$natip" = "" ];then
         natip=`ip addr show br-ex|grep "global dynamic br-ex"|awk '{print $2}'|cut -d/ -f1`
     fi
     osif=$natif
     osip=$natip
 
-    if [ $natip = $ipconf ] && [ -f /etc/sysconfig/network-scripts/ifcfg-br-ex ]
+    if [ "$natip" = "$ipconf" ] && [ -f /etc/sysconfig/network-scripts/ifcfg-br-ex ]
     then
         exit 0 
     fi
@@ -51,9 +51,10 @@ ovsip=$natip
 
 # update /etc/hosts
 
-sed -i  '/localhost/d' /etc/hosts
-sed -i  '/127.0.0.1/d' /etc/hosts
-sed -i  '/$osip/d' /etc/hosts
+sed -i  "/localhost/d" /etc/hosts
+sed -i  "/127.0.0.1/d" /etc/hosts
+sed -i  "/$natip/d" /etc/hosts
+sed -i  "/$osip/d" /etc/hosts
 
 echo "127.0.0.1    lo localhost" | sudo tee -a /etc/hosts
 echo "$osip    "`hostname` |sudo tee -a /etc/hosts
