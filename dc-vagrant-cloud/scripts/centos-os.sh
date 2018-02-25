@@ -1,7 +1,7 @@
 #!/bin/bash
 #  centos openstack with packstack provision script for packer  
 #  Robert Wang
-#  Feb 24th, 2018
+#  Feb 25th, 2018
 
 set -x
 
@@ -14,7 +14,8 @@ systemctl enable network
 systemctl start network
 
 # step 1 sw repo
-yum install -y centos-release-openstack-pike openstack-utils
+yum install -y centos-release-openstack-pike
+yum install -y openstack-utils
 yum update -y
 
 # step 2 install packstack
@@ -30,23 +31,40 @@ natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
 osif=$natif
 osip=$natip
 
-sed -i "/^CONFIG_CONTROLLER_HOST=/c CONFIG_CONTROLLER_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_COMPUTE_HOSTS=/c CONFIG_COMPUTE_HOSTS=$osip" latest_packstack.conf
-sed -i "/^CONFIG_NETWORK_HOSTS=/c CONFIG_NETWORK_HOSTS=$osip" latest_packstack.conf
-sed -i "/^CONFIG_STORAGE_HOST=/c CONFIG_STORAGE_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_SAHARA_HOST=/c CONFIG_SAHARA_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_AMQP_HOST=/c CONFIG_AMQP_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_MARIADB_HOST=/c CONFIG_MARIADB_HOST=$osip" latest_packstack.conf
-sed -i "/^CONFIG_KEYSTONE_LDAP_URL=/c CONFIG_KEYSTONE_LDAP_URL=ldap://$osip" latest_packstack.conf
-sed -i "/^CONFIG_REDIS_HOST=/c CONFIG_REDIS_HOST=$osip" latest_packstack.conf
+CONFIGSET="openstack-config --set latest_packstack.conf general "
+CONFIGGET="openstack-config --get latest_packstack.conf general "
 
-sed -i '/^CONFIG_DEFAULT_PASSWORD=/c CONFIG_DEFAULT_PASSWORD=demo' latest_packstack.conf
-sed -i '/^CONFIG_KEYSTONE_ADMIN_PW=/c CONFIG_KEYSTONE_ADMIN_PW=demo' latest_packstack.conf
-sed -i '/^CONFIG_PROVISION_DEMO=/c CONFIG_PROVISION_DEMO=n' latest_packstack.conf
-sed -i '/^CONFIG_CINDER_INSTALL=/c CONFIG_CINDER_INSTALL=n' latest_packstack.conf
-sed -i '/^CONFIG_SWIFT_INSTALL=/c CONFIG_SWIFT_INSTALL=n' latest_packstack.conf
-sed -i '/^CONFIG_CEILOMETER_INSTALL=/c CONFIG_CEILOMETER_INSTALL=n' latest_packstack.conf
-sed -i '/^CONFIG_NAGIOS_INSTALL=/c CONFIG_NAGIOS_INSTALL=n' latest_packstack.conf
+# update /etc/hosts
+
+sed -i  '/localhost/d' /etc/hosts
+sed -i  '/127.0.0.1/d' /etc/hosts
+sed -i  '/$osip/d' /etc/hosts
+
+echo "127.0.0.1    lo localhost" | sudo tee -a /etc/hosts
+echo "$osip    "`hostname` |sudo tee -a /etc/hosts
+
+$CONFIGSET CONFIG_CONTROLLER_HOST $osip
+$CONFIGSET CONFIG_COMPUTE_HOSTS $osip
+$CONFIGSET CONFIG_NETWORK_HOSTS $osip
+$CONFIGSET CONFIG_STORAGE_HOST $osip
+$CONFIGSET CONFIG_SAHARA_HOST $osip
+$CONFIGSET CONFIG_AMQP_HOST $osip
+$CONFIGSET CONFIG_MARIADB_HOST $osip
+$CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$osip
+$CONFIGSET CONFIG_REDIS_HOST $osip
+
+$CONFIGSET CONFIG_DEFAULT_PASSWORD demo
+$CONFIGSET CONFIG_KEYSTONE_ADMIN_PW demo
+$CONFIGSET CONFIG_PROVISION_DEMO n
+$CONFIGSET CONFIG_CINDER_INSTALL n
+$CONFIGSET CONFIG_SWIFT_INSTALL n
+$CONFIGSET CONFIG_CEILOMETER_INSTALL n
+$CONFIGSET CONFIG_NAGIOS_INSTALL n
+
+$CONFIGSET CONFIG_NOVA_COMPUTE_PRIVIF lo
+$CONFIGSET CONFIG_NOVA_NETWORK_PRIVIF lo
+
+$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
 
 packstack --answer-file latest_packstack.conf  || echo "packstack exited $? and is suppressed."
 
@@ -55,5 +73,9 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/
 rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
+
+
+
 
 
