@@ -36,9 +36,9 @@ CONFIGGET="openstack-config --get latest_packstack.conf general "
 
 # update /etc/hosts
 
-sed -i  '/localhost/d' /etc/hosts
-sed -i  '/127.0.0.1/d' /etc/hosts
-sed -i  '/$osip/d' /etc/hosts
+sed -i  "/localhost/d" /etc/hosts
+sed -i  "/127.0.0.1/d" /etc/hosts
+sed -i  "/$osip/d" /etc/hosts
 
 echo "127.0.0.1    lo localhost" | sudo tee -a /etc/hosts
 echo "$osip    "`hostname` |sudo tee -a /etc/hosts
