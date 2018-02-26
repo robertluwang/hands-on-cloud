@@ -27,8 +27,10 @@ There are few network adaptor options for one node oepnstack setup, NAT Network,
 - create new NAT Network from virtualbox File/Preferences/Network
     - NAT Network adaptor: NatNetwork1  172.25.250.0/24, no DHCP
     - NatNetwork1 port forward: 
+    ```
     127.0.0.1:2222 to 172.25.250.10:2222
-    127.0.0.1:8080 to 172.25.250.10.80
+    127.0.0.1:8080 to 172.25.250.10:80
+    ```
 - change in vm setting/Network
     - Attached to: NAT Network, Name: NatNetwork1
     - Adapter Type: Paravirtualized Network (virtio-net) for better network performance 
