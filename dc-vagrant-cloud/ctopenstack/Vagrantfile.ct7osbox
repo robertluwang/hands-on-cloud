@@ -10,8 +10,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.define "ossandbox1" do |ct7|
         ct7.vm.hostname = "ossandbox1"
-        ct7.vm.provision "shell", path: "../scripts/centos-pack-update.sh", privileged: true
-
+        
         ct7.vm.provider :virtualbox do |vb|
             vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
             vb.name="ossandbox1"
