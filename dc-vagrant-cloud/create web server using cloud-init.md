@@ -1,7 +1,7 @@
 # create web server using cloud-init
 
 ## openstack sandbox 
-Follow up the setup guide here.
+Follow up the [setup guide](https://github.com/robertluwang/cloud-hands-on-guide/blob/master/dc-vagrant-cloud/One%20Node%20one%20NIC%20Openstack%20Sandbox(centos)%20Setup%20Guide.md).
 
 ## create web server instance using cloud-init
 web-server-vm1, fedora, m2.small,
