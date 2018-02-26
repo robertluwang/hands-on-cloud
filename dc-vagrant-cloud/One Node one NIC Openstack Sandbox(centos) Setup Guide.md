@@ -46,6 +46,7 @@ $ ssh vagrant@localhost -p 2222
 - use ssh keypair
 
 I used default vagrant public key in openstack sandbox vm, so you need to download vagrant private key from [here](https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant) to match it, place to your laptop shell home/.ssh or install key to putty.
+
     - putty cannot directly use the private key from vagrant, need to convert key to putty format using puttygen.
     - run puttygen, load the vagrant key file, then save private key to vagrant.ppk.
     - in putty/SSH/Auth, select vagrant.ppk for private key file for auth.
