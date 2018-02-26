@@ -47,6 +47,10 @@ $ ssh vagrant@localhost -p 2222
 
 I used default vagrant public key in openstack sandbox vm, so you need to download vagrant private from [here](https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant), place to your laptop shell home/.ssh or install to putty.
 
+- dashboard GUI 
+
+http://localhost:8080
+
 ## verify NAT Network OVS setting
 ```
 [vagrant@ctosbox1 ~]$ cd /etc/sysconfig/network-scripts/
