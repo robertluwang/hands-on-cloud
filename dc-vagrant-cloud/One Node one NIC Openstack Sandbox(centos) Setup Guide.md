@@ -1,273 +1,230 @@
 
 # One Node One NIC Openstack Sandbox(centos) Setup Guide
 
-## virtulabox node setting
+## virtulabox vm node
 - centOS based vm
-- one NAT NIC: enough for one node packstack installation
 - memory: 4-6GB 
 - CPU: 2
-- HD: 50G 
+- HD: 50G
 
-## use vagrant for openstack
-I used vagrant to launch openstack sandbox which installed by packstack.
-There is default 1st NIC is NAT for vagrant access, I just used as management ip for openstack.
+You can build it from [centos 7 Minimal iso](http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso) manually, then followed [RDO packstack guide](https://www.rdoproject.org/install/packstack/) to install one node openstack manually.
+
+Also I created this [centos7 openstack sandbox box](https://app.vagrantup.com/dreamcloud/boxes/ct7os) to help you launch a test openstack sandbox in few mins using Vagrant.
+
+## use vagrant to launch openstack sandbox
 ```
 $ mkdir vagrant/ossandbox1
 $ curl -Lo Vagrantfile 
 https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/ctopenstack/Vagrantfile.ct7osbox
 $ vagrant up 
 ```
-this openstack sandbox ready for you:
-
-- openstack OVS config done, use NAT NIC for both openstack and OVS
-- dashboard, since this is NAT so cannot directly access to it, just add localhost:8080 to guest 80 in virtualbox GUI, then access http://localhost:8080/dashboard
+- openstack OVS config done, use NAT NIC for both openstack and OVS br-ex
 - openstack sandbox vm user/password: vagrant/vagrant
-- openstack sandbox default user/password: admin/demo, demo/demo
+- openstack sandbox default user/password: admin/demo
+
+## openstack interface setup in virtualbox 
+There are few network adaptor options for one node oepnstack setup, NAT Network, Hostonly + NAT, or bridged, we do demo NAT Network one NIC here.
+- create new NAT Network from virtualbox File/Preferences/Network
+    - NAT Network adaptor: NatNetwork1  172.25.250.0/24, no DHCP
+    - NatNetwork1 port forward: 
+    127.0.0.1:2222 to 172.25.250.10:2222
+    127.0.0.1:8080 to 172.25.250.10.80
+- change in vm setting/Network
+    - Attached to: NAT Network, Name: NatNetwork1
+    - Adapter Type: Paravirtualized Network (virtio-net) for better network performance 
+    - Promiscuous Mode: Allow All, needed for OVS traffic 
 
 ## openstack sandbox vm access
-you can use any ssh client to access to vm, for example putty.
+you can use any ssh client to access to openstack vm, for example putty.
 
 - use user/password:
 ```
-$ ssh vagrant@localhost:2222
+$ ssh vagrant@localhost -p 2222
 ```
 - use ssh keypair
 
 I used default vagrant public key in openstack sandbox vm, so you need to download vagrant private from [here](https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant), place to your laptop shell home/.ssh or install to putty.
 
-## verify OVS br-ex
+## verify NAT Network OVS setting
 ```
-[vagrant@ossandbox1 ~]$ ip addr show br-ex
-5: br-ex: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN qlen 1000
-    link/ether 08:00:27:3b:90:4d brd ff:ff:ff:ff:ff:ff
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global br-ex
+[vagrant@ctosbox1 ~]$ cd /etc/sysconfig/network-scripts/
+[vagrant@ctosbox1 network-scripts]$ ls -ltr|grep ifcfg
+-rw-r--r--. 1 root root   254 Feb 22 18:13 ifcfg-lo
+-rw-r--r--. 1 root root    93 Feb 22 21:39 ifcfg-enp0s3
+-rw-r--r--. 1 root root   217 Feb 22 21:39 ifcfg-br-ex
+```
+the NAT interface file is enp0s3 but from ip addr, cannot find enp0s3 but there is eth0 and not up, this is because when change NAT Network adapter type, the interface changed to eth0.
+
+we rename enp0s3 to eth0 and update name in ifcfg-eth0, 
+```
+[vagrant@ctosbox1 ~]$ sudo mv ifcfg-enp0s3 ifcfg-eth0 
+[vagrant@ctosbox1 ~]$ sudo cat ifcfg-eth0
+DEVICE=eth0
+NAME=eth0
+DEVICETYPE=ovs
+TYPE=OVSPort
+OVS_BRIDGE=br-ex
+ONBOOT=yes
+BOOTPROTO=none
+```
+also update ifcfg-br-ex from dhcp to static as below,
+```
+[vagrant@ctosbox1 ~]$ sudo cat ifcfg-br-ex
+ONBOOT="yes"
+NETBOOT="yes"
+IPADDR=172.25.250.10
+NETMASK=255.255.255.0
+GATEWAY=172.25.250.1
+DEVICE=br-ex
+NAME=br-ex
+DEVICETYPE=ovs
+OVSBOOTPROTO="static"
+TYPE=OVSBridge
+OVS_EXTRA="set bridge br-ex fail_mode=standalone"
+```
+restart network to make the change,
+```
+sudo systemctl restart network.service
+```
+ip addr
+```
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master ovs-system state UP qlen 1000
+    link/ether 08:00:27:b4:a5:ff brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::a00:27ff:feb4:a5ff/64 scope link
        valid_lft forever preferred_lft forever
-    inet6 fe80::a00:27ff:fe3b:904d/64 scope link
+
+4: br-ex: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN qlen 1000
+    link/ether 08:00:27:b4:a5:ff brd ff:ff:ff:ff:ff:ff
+    inet 172.25.250.10/24 brd 172.25.250.255 scope global br-ex
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:feb4:a5ff/64 scope link
        valid_lft forever preferred_lft forever
 ```
+
 ## verify routing table
 ```
-[vagrant@ossandbox1 ~]$ ip route
-default via 10.0.2.2 dev br-ex
-10.0.2.0/24 dev br-ex proto kernel scope link src 10.0.2.15
-169.254.0.0/16 dev enp0s3 scope link metric 1002
-169.254.0.0/16 dev br-ex scope link metric 1005
-
-[vagrant@ossandbox1 ~]$ route -en
+vagrant@ctosbox1]$ route -en
 Kernel IP routing table
 Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.0.2.2        0.0.0.0         UG        0 0          0 br-ex
-10.0.2.0        0.0.0.0         255.255.255.0   U         0 0          0 br-ex
-169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 enp0s3
+0.0.0.0         172.25.250.1    0.0.0.0         UG        0 0          0 br-ex
+169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth0
 169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 br-ex
+172.25.250.0    0.0.0.0         255.255.255.0   U         0 0          0 br-ex
 ```
-## clean up all existing project/network 
-clean up in this order,
-
-as project user:
-
-- delete instance, release/delete floating ip
-- delete router: clear gateway,delete interface then delete router 
-- delete private network: delete ports/private subnet then delete private network
-
-as admin user:
-
-- delete public network: delete ports/public subnet then delete public network
 
 ## create new project and user
 - login as admin
 - go to Identity
 - create project: lab_project
-- create user: lab_user with lab_project, password: redhat
+- create user: lab_user with lab_project, password: demo
 
 ## create source file for lab_user
 ```
-[vagrant@ossandbox1 ]$ cp keystonerc_demo keystonerc_user
-[vagrant@ossandbox1 ]$ cat keystonerc_user
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ cat keystonerc_user
 unset OS_SERVICE_TOKEN
-export OS_USERNAME=lab_user
-export OS_PASSWORD='redhat'
-export PS1='[\u@\h \W(keystone_lab_user)]\$ '
-export OS_AUTH_URL=http://10.0.2.15:5000/v3
+    export OS_USERNAME=lab_user
+    export OS_PASSWORD='demo'
+    export OS_AUTH_URL=http://172.25.250.10:5000/v3
+    export PS1='[\u@\h \W(keystone_lab_user)]\$ '
 
 export OS_PROJECT_NAME=lab_project
 export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
 export OS_IDENTITY_API_VERSION=3
 ```
-then verify source file, 
-```
-[vagrant@ossandbox1 ]$ source keystonerc_user
-[vagrant@ossandbox1 ~(keystone_lab_user)]$ nova list
-+----+------+--------+------------+-------------+----------+
-| ID | Name | Status | Task State | Power State | Networks |
-+----+------+--------+------------+-------------+----------+
-+----+------+--------+------------+-------------+----------+
+[vagrant@ctosbox1 ~]$ source keystonerc_user
 
-[vagrant@ossandbox1 ~(keystone_user)]$ openstack project list
-+----------------------------------+-------------+
-| ID                               | Name        |
-+----------------------------------+-------------+
-| 346f42ef2bdb420b8c15527018b76da8 | lab_project |
-+----------------------------------+-------------+
-```
 ## create new public network 
 - as admin
 - Network/Networks: create public network - lab_pubnet with lab_project, flat with physical interface extnet, enable External Network
-- Subnet: lab_pubsub, 172.25.250.0/24, gateway: 172.25.250.254
-- Subnet details: no DCHP, 172.25.250.26 to 172.25.250.99, dns: 10.0.2.3, 8.8.8.8
+- Subnet: lab_pubsub, 172.25.250.0/24, gateway: 172.25.250.1
+- Subnet details: no DCHP, 172.25.250.26 to 172.25.250.99, dns: 172.25.250.1, 8.8.8.8
 
 ## create new private network 
 - as lab_user
 - Network/Networks: create private network - lab_privnet with lab_project
-- Subnet: lab_privsub, 192.168.10.0/24, gateway: 192.168.10.25
-- Subnet details: DHCP, 192.168.10.30 to 192.168.10.50, dns: 10.0.2.3, 8.8.8.8
-
-## create new router 
-- as lab_user
-- Network/Router: lab_router with public network lab_pubnet 
-- add Interface: private network 192.168.10.0/24
-- gateway: leave as blank, then gateway 192.168.10.25 will be used as router interface
+- Subnet: lab_privsub, 192.168.10.0/24, gateway: 192.168.10.1
+- Subnet details: DHCP, 192.168.10.30 to 192.168.10.50, dns: 172.25.250.1, 8.8.8.8
 
 ## create new security group
 - as lab_user
 - Network/Security Groups:  lab_sg
-- add rule to lab_sg: ICMP and SSH for ingress IPv4
+- add rule to lab_sg: ICMP,SSH,FTP(TCP 20,21), HTTP for ingress IPv4
 
 ## create new keypair
 - as lab_user
 - Compute/Key Pairs
-- save private key to vagrant ~/.ssh/lab-key, chmod 600 lab-key
+- save private key to vagrant ~/.ssh/lab-key.pem, chmod 600 lab-key.pem
 
-## create new instance
+## create new cirros instance
 - as lab_user
-- Compute/Instances: lab-vm1, lab_privnet, m1.tiny, cirros, lab_sg, lab-key
-- vm assigned private ip 192.168.10.x
-- associate floating ip 172.25.250.x
+- Compute/Instances: vm1, lab_privnet, m1.tiny, cirros, lab_sg, lab-key.pem
+- vm assigned private ip 192.168.10.35
+- associate floating ip 172.25.250.30
 
 ## verify from CLI 
 ```
-[vagrant@ossandbox1 ~(keystone_user)]$ nova list
-+--------------------------------------+------+--------+------------+-------------+------------------------------------------+
-| ID                                   | Name | Status | Task State | Power State | Networks                                 |
-+--------------------------------------+------+--------+------------+-------------+------------------------------------------+
-| e6e9c050-a01f-4eef-851e-2b963d3e18ff | vm1  | ACTIVE | -          | Running     | lab_privnet=192.168.10.40, 172.25.250.34 |
-+--------------------------------------+------+--------+------------+-------------+------------------------------------------+
-[vagrant@ossandbox1 ~(keystone_user)]$ openstack network list
-+--------------------------------------+-------------+--------------------------------------+
-| ID                                   | Name        | Subnets                              |
-+--------------------------------------+-------------+--------------------------------------+
-| 6ebdf557-c5b2-4678-82ab-7cf3629b7da5 | lab_privnet | 3ff025c9-d967-4a41-b8a2-451cfb5b778f |
-| bf89f606-463c-4f2f-8f95-a5c9b8cbab50 | lab_pubnet  | 96627173-2050-4bb0-9382-e644cae40a46 |
-+--------------------------------------+-------------+--------------------------------------+
-[vagrant@ossandbox1 ~(keystone_user)]$ openstack router list
-+--------------------------------------+------------+--------+-------+-------------+-------+----------------------------------+
-| ID                                   | Name       | Status | State | Distributed | HA    | Project                          |
-+--------------------------------------+------------+--------+-------+-------------+-------+----------------------------------+
-| cc374cbb-81b7-4fff-a3f2-37854a222fd6 | lab_router | ACTIVE | UP    | False       | False | 346f42ef2bdb420b8c15527018b76da8 |
-+--------------------------------------+------------+--------+-------+-------------+-------+----------------------------------+
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ nova list
++--------------------------------------+--------+--------+------------+-------------+------------------------------------------+
+| ID                                   | Name   | Status | Task State | Power State | Networks                                 |
++--------------------------------------+--------+--------+------------+-------------+------------------------------------------+
+| c81710b1-4909-4382-852f-7fbd82c1a15b | ub-vm1 | ACTIVE | -          | Running     | lab_privnet=192.168.10.34, 172.25.250.32 |
+| dea8a148-f470-4325-8bf0-ee9ce8cdda7f | vm2    | ACTIVE | -          | Running     | lab_privnet=192.168.10.35, 172.25.250.30 |
++--------------------------------------+--------+--------+------------+-------------+------------------------------------------+
 ```
 
-## OVS public network access
-common issue:
+## namespace netns test for cirros vm  
 
-- cannot access to floating ip
-- vm instance cannot access to Internet
-
-the behind reason is OVS br-ex external bridge missing public port, in our case is 172.25.250.0/24.
-
-here is remedy to add it manually, 
+we can ping floating ip but not private ip, this is expected, 
 ```
-sudo ip addr add 172.25.250.254/24 dev br-ex
-sudo iptables -t nat -I POSTROUTING 1 -s 172.25.250.0/24 -j MASQUERADE
-```
-
-Now will see it in routing table and br-ex interface, 
-```
-[vagrant@ossandbox1 ~(keystone_lab_user)]$ route -en
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         10.0.2.2        0.0.0.0         UG        0 0          0 br-ex
-10.0.2.0        0.0.0.0         255.255.255.0   U         0 0          0 br-ex
-169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 enp0s3
-169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 br-ex
-172.25.250.0    0.0.0.0         255.255.255.0   U         0 0          0 br-ex
-[vagrant@ossandbox1 ~(keystone_user)]$ ip addr show br-ex
-25: br-ex: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN qlen 1000
-    link/ether 08:00:27:3b:90:4d brd ff:ff:ff:ff:ff:ff
-    inet 10.0.2.15/24 brd 10.0.2.255 scope global br-ex
-       valid_lft forever preferred_lft forever
-    inet 172.25.250.254/24 scope global br-ex
-       valid_lft forever preferred_lft forever
-    inet6 fe80::74cb:f8ff:fe47:6049/64 scope link
-       valid_lft forever preferred_lft forever
-```
-## verify access to vm
-we can ping and ssh vm floating ip properly now,
-```
-[vagrant@ossandbox1 ~(keystone_user)]$ ping 172.25.250.34
-PING 172.25.250.34 (172.25.250.34) 56(84) bytes of data.
-64 bytes from 172.25.250.34: icmp_seq=1 ttl=63 time=10.9 ms
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ ping 192.168.10.35
+PING 192.168.10.35 (192.168.10.35) 56(84) bytes of data.
 ^C
---- 172.25.250.34 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 10.918/10.918/10.918/0.000 ms
-[vagrant@ossandbox1 ~(keystone_user)]$ ssh -i /home/vagrant/.ssh/lab-key cirros@172.25.250.34
-The authenticity of host '172.25.250.34 (172.25.250.34)' can't be established.
-RSA key fingerprint is SHA256:qcLsMKrslFxdrCsRdtg0sYthfF1jQoIOUtpGaCW7oec.
-RSA key fingerprint is MD5:67:ea:cf:23:19:ab:96:01:7e:6c:6b:c8:2c:0e:9c:86.
-Are you sure you want to continue connecting (yes/no)? yes
-Warning: Permanently added '172.25.250.34' (RSA) to the list of known hosts.
+--- 192.168.10.35 ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 999ms
+
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ ping 172.25.250.30
+PING 172.25.250.30 (172.25.250.30) 56(84) bytes of data.
+64 bytes from 172.25.250.30: icmp_seq=1 ttl=63 time=6.59 ms
+64 bytes from 172.25.250.30: icmp_seq=2 ttl=63 time=0.875 ms
+--- 172.25.250.30 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 0.875/3.737/6.599/2.862 ms
+```
+we can access private ip inside netns, 
+```
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ sudo ip netns
+qrouter-7d5c225b-a205-450d-8785-f4083d611bcc
+qdhcp-f8344d75-19f3-4b18-bf05-659ec5206845
+
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ sudo ip netns exec qrouter-7d5c225b-a205-450d-8785-f4083d611bcc ping 192.168.10.35
+PING 192.168.10.35 (192.168.10.35) 56(84) bytes of data.
+64 bytes from 192.168.10.35: icmp_seq=1 ttl=64 time=1.40 ms
+```
+## ssh to cirros vm in netns 
+cirros vm can access to Internet, 
+```
+[vagrant@ctosbox1 ~(keystone_lab_user)]$ sudo ip netns exec qrouter-7d5c225b-a205-450d-8785-f4083d611bcc ssh -i /home/vagrant/.ssh/lab-key.pem cirros@172.25.250.30
 $
-```
-## verify vm Internet access
-from vm we can access Internet as well,
-```
-$ route -en
-Kernel IP routing table
-Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-0.0.0.0         192.168.10.25   0.0.0.0         UG        0 0          0 eth0
-169.254.169.254 192.168.10.25   255.255.255.255 UGH       0 0          0 eth0
-192.168.10.0    0.0.0.0         255.255.255.0   U         0 0          0 eth0
+
 $ cat /etc/resolv.conf
 search openstacklocal
-nameserver 10.0.2.3
+nameserver 172.25.250.1
 nameserver 8.8.8.8
-$ ping 10.0.2.2
-PING 10.0.2.2 (10.0.2.2): 56 data bytes
-64 bytes from 10.0.2.2: seq=0 ttl=61 time=1.737 ms
-^C
---- 10.0.2.2 ping statistics ---
-1 packets transmitted, 1 packets received, 0% packet loss
-round-trip min/avg/max = 1.737/1.737/1.737 ms
-$ ping google.ca
-PING google.ca (135.0.199.38): 56 data bytes
-64 bytes from 135.0.199.38: seq=0 ttl=48 time=21.818 ms
-```
-## new OVS network issue 
-after reboot vm, this br-ex setting will be lost, sometimes even add it back, the ssh to floating ip not working in router namespace but ssh to private ip working and vm can access to Internet.
+$ ping 172.25.250.1
+PING 172.25.250.1 (172.25.250.1): 56 data bytes
+64 bytes from 172.25.250.1: seq=0 ttl=254 time=2.227 ms
+64 bytes from 172.25.250.1: seq=1 ttl=254 time=2.159 ms
 
-remedy
-```
-[vagrant@ossandbox1 ~(keystone_user)]$ sudo ip addr add 172.25.250.254/24 dev br-ex
-[vagrant@ossandbox1 ~(keystone_user)]$ sudo iptables -t nat -I POSTROUTING 1 -s 172.25.250.0/24 -j MASQUERADE
-```
-cannot ping/ssh to floating ip in netns, 
-```
-[vagrant@ossandbox1 ~(keystone_user)]$ sudo ip netns exec qrouter-cc374cbb-81b7-4fff-a3f2-37854a222fd6 ping 172.25.250.34
-PING 172.25.250.34 (172.25.250.34) 56(84) bytes of data.
-^C
-```
-however ping/ssh working for private ip in netns, and vm Internet access fine.
-```
-[vagrant@ossandbox1 ~(keystone_user)]$ sudo ip netns exec qrouter-cc374cbb-81b7-4fff-a3f2-37854a222fd6 ssh -i /home/vagrant/.ssh/lab-key cirros@192.168.10.40
-$ ping google.ca
-PING google.ca (135.0.199.249): 56 data bytes
-64 bytes from 135.0.199.249: seq=0 ttl=40 time=39.504 ms
-64 bytes from 135.0.199.249: seq=1 ttl=40 time=43.974 ms
-```
-Found too many similar post in Internet but no valid solution found yet.
+$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: seq=0 ttl=41 time=28.814 ms
 
+$ ping google.ca
+PING google.ca (172.217.9.131): 56 data bytes
+64 bytes from 172.217.9.131: seq=0 ttl=47 time=42.956 ms
+64 bytes from 172.217.9.131: seq=1 ttl=47 time=48.956 ms
+```
 
 
 
