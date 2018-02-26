@@ -63,7 +63,7 @@ http://localhost:8080
 -rw-r--r--. 1 root root    93 Feb 22 21:39 ifcfg-enp0s3
 -rw-r--r--. 1 root root   217 Feb 22 21:39 ifcfg-br-ex
 ```
-the NAT interface file is enp0s3 howver from ip addr, cannot find enp0s3, there is new eth0 and not up, this is because when change NAT Network adapter type, the interface changed to eth0.
+the NAT interface file is enp0s3 however from ip addr, cannot find enp0s3, there is new eth0 and not up, this is because when change NAT Network adapter type, the interface changed to eth0.
 
 we rename enp0s3 to eth0 and update name in ifcfg-eth0, 
 ```
