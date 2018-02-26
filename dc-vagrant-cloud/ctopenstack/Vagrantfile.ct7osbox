@@ -8,12 +8,12 @@ Vagrant.configure("2") do |config|
     config.ssh.insert_key = false
     config.vm.box_check_update = false
 
-    config.vm.define "ossandbox1" do |ct7|
-        ct7.vm.hostname = "ossandbox1"
+    config.vm.define "ctosbox1" do |ct7|
+        ct7.vm.hostname = "ctosbox1"
         
         ct7.vm.provider :virtualbox do |vb|
             vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-            vb.name="ossandbox1"
+            vb.name="ctosbox1"
             vb.memory=6144
         end
     end
