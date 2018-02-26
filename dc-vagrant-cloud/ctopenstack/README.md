@@ -12,7 +12,7 @@ launch centos 7 vm node:
 - memory: 6GB
 - cpu: 2
 - 1st NIC: NAT
-- 2nd NIC: hostonly private network  10.120.0.21
+- 2nd NIC: hostonly private network  172.25.250.10
 ```
 vagrant up
 vagrant ssh
@@ -31,7 +31,7 @@ launch centos 7 openstack vm node with inscript:
 - memory: 6GB
 - cpu: 2
 - 1st NIC: NAT
-- 2nd NIC: hostonly private network  10.120.0.21
+- 2nd NIC: hostonly private network  172.25.250.10
 ```
 vagrant up
 vagrant ssh
@@ -50,7 +50,7 @@ launch centos 7 openstack vm node with external script:
 - memory: 6GB
 - cpu: 2
 - 1st NIC: NAT
-- 2nd NIC: hostonly private network  10.120.0.21
+- 2nd NIC: hostonly private network  172.25.250.10
 ```
 vagrant up
 vagrant ssh
@@ -69,7 +69,7 @@ launch using ct7os box:
 - memory: 8GB
 - cpu: 2
 - 1st NIC: NAT
-- 2nd NIC: hostonly private network  10.120.0.21
+- 2nd NIC: hostonly private network  172.25.250.10
 ```
 vagrant up
 ```
@@ -96,7 +96,7 @@ launch using ct7os box:
 - memory: 8GB
 - cpu: 2
 - 1st NIC: NAT
-- 2nd NIC: hostonly private network  10.120.0.21
+- 2nd NIC: hostonly private network  172.25.250.10
 ```
 vagrant up
 ```
