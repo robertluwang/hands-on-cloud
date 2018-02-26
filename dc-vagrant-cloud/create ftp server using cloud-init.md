@@ -1,7 +1,7 @@
 # Create ftp server using cloud-init
 
 ## openstack sandbox setup
-
+Follow up the [setup guide](https://github.com/robertluwang/cloud-hands-on-guide/blob/master/dc-vagrant-cloud/One%20Node%20one%20NIC%20Openstack%20Sandbox(centos)%20Setup%20Guide.md).
 
 ## create ftp server 
 - new instance: ftp-server-vm1, m2.small
@@ -14,10 +14,6 @@ runcmd:
 packages:
  - vsftpd
 ```
-![](1nic-packstack10.jpg)
-
-![](1nic-packstack11.jpg)
-
 ## monitor instance booting log 
 Project/Compute/Instances/Log/View Full Log
 
