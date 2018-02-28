@@ -12,14 +12,15 @@ natif1=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep 
 natif2=`cat /etc/sysconfig/network-scripts/ifcfg-br-ex | grep OVSDHCPINTERFACES|cut -d= -f2`
 
 if [ -z "$1" ];then
-    $1=10.0.2.15
+    osip=10.0.2.15
+else 
+    osip=$1
 fi
 
 # if find enp0s3 in ifcfg-br-ex, assume NAT NIC already config as OVS DHCP then process NAT Network setup; o/w exit
 
 if [ "natif1" = "natif2" ];then
     osif=$natif1
-    osip=$1
 else
     exit 0 
 fi
@@ -99,6 +100,7 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/
 rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
 
  
 
