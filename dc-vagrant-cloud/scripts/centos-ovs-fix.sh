@@ -15,7 +15,7 @@ else
     natnetip=$2
 fi
 
-# check nat interface ifcfg-xxx
+# check interface ifcfg-enp0s3
 natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
 
 rm /etc/sysconfig/network-scripts/ifcfg-$natif 
@@ -88,11 +88,8 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 
 # update source file
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_admin
-
-rm /home/vagrant/keystonerc_admin
-cp /root/keystonerc_admin /home/vagrant/
-chown vagrant:vagrant /home/vagrant/keystonerc*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
 
 #packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+
 
