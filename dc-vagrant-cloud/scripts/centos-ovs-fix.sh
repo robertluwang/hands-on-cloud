@@ -19,7 +19,7 @@ fi
 
 # if find enp0s3 in ifcfg-br-ex, assume NAT NIC already config as OVS DHCP then process NAT Network setup; o/w exit
 
-if [ "natif1" = "natif2" ];then
+if [ "$natif1" = "$natif2" ];then
     osif=$natif1
 else
     exit 0 
