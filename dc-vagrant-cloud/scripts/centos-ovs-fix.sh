@@ -3,52 +3,45 @@
 # NAT Network openstack ovs fix script
 # Robert Wang @github.com/robertluwang
 # Feb 28th, 2018
-# $1 - NAT Network NIC ip
+# $1 - NAT Network NIC interface, such as eth0
+# $2 - NAT Network NIC ip address, such as 172.25.250.10
 
 set -x
 
-# check interface ifcfg-enp0s3
-natif1=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
-natif2=`cat /etc/sysconfig/network-scripts/ifcfg-br-ex | grep OVSDHCPINTERFACES|cut -d= -f2`
-
-if [ -z "$1" ];then
-    osip=10.0.2.15
-else 
-    osip=$1
-fi
-
-# if find enp0s3 in ifcfg-br-ex, assume NAT NIC already config as OVS DHCP then process NAT Network setup; o/w exit
-
-if [ "$natif1" = "$natif2" ];then
-    osif=$natif1
-else
+if [ -z "$1" ] && [ -z "$2" ];then
     exit 0 
+else 
+    natnetif=$1
+    natnetip=$2
 fi
 
-rm /etc/sysconfig/network-scripts/ifcfg-$osif  
+# check interface ifcfg-enp0s3
+natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
+
+rm /etc/sysconfig/network-scripts/ifcfg-$natif 
 rm /etc/sysconfig/network-scripts/ifcfg-br-ex 
 
 # ovs config 
 
 # generate new interface file
-cat <<EOF > /tmp/ifcfg-eth0
-DEVICE=eth0
-NAME=eth0
+cat <<EOF > /tmp/ifcfg-$natnetif
+DEVICE=$natnetif
+NAME=$natnetif
 ONBOOT=yes
 TYPE=OVSPort
 DEVICETYPE=ovs
 OVS_BRIDGE=br-ex
 EOF
 
-mv /tmp/ifcfg-eth0 /etc/sysconfig/network-scripts
+mv /tmp/ifcfg-$natnetif /etc/sysconfig/network-scripts
 
 # generate ifcfg-br-ex
-gw=`echo $osip|cut -d. -f1,2,3`.1
+gw=`echo $natnetip|cut -d. -f1,2,3`.1
 
 cat <<EOF > /tmp/ifcfg-br-ex
 ONBOOT="yes"
 NETBOOT="yes"
-IPADDR=$osip
+IPADDR=$natnetip
 NETMASK=255.255.255.0
 GATEWAY=$gw
 DNS1=$gw
@@ -76,27 +69,30 @@ CONFIGGET="openstack-config --get latest_packstack.conf general "
 
 ipconf=`$CONFIGGET CONFIG_CONTROLLER_HOST`
 
-$CONFIGSET CONFIG_CONTROLLER_HOST $osip
-$CONFIGSET CONFIG_COMPUTE_HOSTS $osip
-$CONFIGSET CONFIG_NETWORK_HOSTS $osip
-$CONFIGSET CONFIG_STORAGE_HOST $osip
-$CONFIGSET CONFIG_SAHARA_HOST $osip
-$CONFIGSET CONFIG_AMQP_HOST $osip
-$CONFIGSET CONFIG_MARIADB_HOST $osip
-$CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$osip
-$CONFIGSET CONFIG_REDIS_HOST $osip
+$CONFIGSET CONFIG_CONTROLLER_HOST $natnetip
+$CONFIGSET CONFIG_COMPUTE_HOSTS $natnetip
+$CONFIGSET CONFIG_NETWORK_HOSTS $natnetip
+$CONFIGSET CONFIG_STORAGE_HOST $natnetip
+$CONFIGSET CONFIG_SAHARA_HOST $natnetip
+$CONFIGSET CONFIG_AMQP_HOST $natnetip
+$CONFIGSET CONFIG_MARIADB_HOST $natnetip
+$CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$natnetif
+$CONFIGSET CONFIG_REDIS_HOST $natnetip
 
 $CONFIGSET CONFIG_NOVA_COMPUTE_PRIVIF lo
 $CONFIGSET CONFIG_NOVA_NETWORK_PRIVIF lo
 
-$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:eth0
+$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$natnetif
 
-sed -i "s/$ipconf/$osip/g" latest_packstack.conf 
+sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf 
 
 # update source file
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_admin
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_admin
 
 rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
+packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+
