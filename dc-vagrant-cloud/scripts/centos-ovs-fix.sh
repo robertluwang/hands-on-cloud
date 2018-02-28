@@ -15,7 +15,7 @@ else
     natnetip=$2
 fi
 
-# check interface ifcfg-enp0s3
+# check nat interface ifcfg-xxx
 natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
 
 rm /etc/sysconfig/network-scripts/ifcfg-$natif 
@@ -94,5 +94,5 @@ rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
-packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+#packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
 
