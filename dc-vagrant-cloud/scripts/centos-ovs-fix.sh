@@ -25,8 +25,8 @@ else
     exit 0 
 fi
 
-mv /etc/sysconfig/network-scripts/ifcfg-$osif  /etc/sysconfig/network-scripts/ifcfg-$osif.old
-mv /etc/sysconfig/network-scripts/ifcfg-br-ex /etc/sysconfig/network-scripts/ifcfg-br-ex.old
+rm /etc/sysconfig/network-scripts/ifcfg-$osif  
+rm /etc/sysconfig/network-scripts/ifcfg-br-ex 
 
 # ovs config 
 
@@ -100,15 +100,3 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/
 rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
-
-
- 
-
-
-
-
-
- 
-
-
-
