@@ -48,7 +48,7 @@ gw=`echo $osip|cut -d. -f1,2,3`.1
 cat <<EOF > /tmp/ifcfg-br-ex
 ONBOOT="yes"
 NETBOOT="yes"
-IPADDR=$1
+IPADDR=$osip
 NETMASK=255.255.255.0
 GATEWAY=$gw
 DNS1=$gw
@@ -89,7 +89,7 @@ $CONFIGSET CONFIG_REDIS_HOST $osip
 $CONFIGSET CONFIG_NOVA_COMPUTE_PRIVIF lo
 $CONFIGSET CONFIG_NOVA_NETWORK_PRIVIF lo
 
-$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
+$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:eth0
 
 sed -i "s/$ipconf/$osip/g" latest_packstack.conf 
 
