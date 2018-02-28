@@ -9,7 +9,7 @@ set -x
 
 # check interface ifcfg-enp0s3
 natif1=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
-natif2=`cat /etc/sysconfig/network-scripts/ifcfg-br-ex | grep OVSDHCP|awk '{print $2}'`
+natif2=`cat /etc/sysconfig/network-scripts/ifcfg-br-ex | grep OVSDHCPINTERFACES|cut -d= -f2`
 
 if [ -z "$1" ];then
     $1=10.0.2.15
@@ -32,6 +32,7 @@ mv /etc/sysconfig/network-scripts/ifcfg-br-ex /etc/sysconfig/network-scripts/ifc
 # generate new interface file
 cat <<EOF > /tmp/ifcfg-eth0
 DEVICE=eth0
+NAME=eth0
 ONBOOT=yes
 TYPE=OVSPort
 DEVICETYPE=ovs
@@ -67,10 +68,6 @@ sed -i '/nameserver/d' /etc/resolv.conf
 sed -i "$ a nameserver    $gw" /etc/resolv.conf
 sed -i "$ a nameserver    8.8.8.8" /etc/resolv.conf
 
-## restart network 
-
-systemctl restart network
-
 # update latest_packstack.conf
 
 CONFIGSET="openstack-config --set latest_packstack.conf general "
@@ -91,14 +88,9 @@ $CONFIGSET CONFIG_REDIS_HOST $osip
 $CONFIGSET CONFIG_NOVA_COMPUTE_PRIVIF lo
 $CONFIGSET CONFIG_NOVA_NETWORK_PRIVIF lo
 
-$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$ovsif
+$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
 
 sed -i "s/$ipconf/$osip/g" latest_packstack.conf 
-
-echo "CONFIG_NOVA_COMPUTE_PRIVIF=lo" | sudo tee -a latest_packstack.conf
-echo "CONFIG_NOVA_NETWORK_PRIVIF=lo" | sudo tee -a latest_packstack.conf
-
-packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
 
 # update source file
 
@@ -107,6 +99,12 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/
 rm /home/vagrant/keystonerc_admin
 cp /root/keystonerc_admin /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
+ 
+
+
+
+
 
  
 
