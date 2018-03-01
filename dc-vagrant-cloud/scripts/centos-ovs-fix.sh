@@ -88,7 +88,10 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 
 # update source file
 
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
+cp /root/keystonerc_* /home/vagrant/
+chown vagrant:vagrant /home/vagrant/keystonerc*
 
 echo 
 echo "The ovs reconfig done:"
