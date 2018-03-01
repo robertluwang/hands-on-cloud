@@ -37,13 +37,11 @@ else
     if [ "$natip" = "" ];then
         natip=`ip addr show br-ex|grep "global dynamic br-ex"|awk '{print $2}'|cut -d/ -f1`
     fi
-    osif=$natif
-    osip=$natip
 
-    if [ "$natip" = "$ipconf" ] && [ -f /etc/sysconfig/network-scripts/ifcfg-br-ex ]
-    then
-        exit 0 
-    fi
+    curl -LO https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/scripts/centos-ovs-fix.sh
+    chmod +x centos-ovs-fix.sh
+    ./centos-ovs-fix.sh eth0 $natip
+    exit 0 
 fi
 
 ovsif=$natif
@@ -80,11 +78,15 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$ovsif
 
 packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_admin
-
-rm /home/vagrant/keystonerc_admin
-cp /root/keystonerc_admin /home/vagrant/
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+cp /root/keystonerc_* /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
+
+
+
+
 
 
 
