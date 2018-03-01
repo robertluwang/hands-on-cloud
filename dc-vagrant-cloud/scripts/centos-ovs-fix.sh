@@ -90,6 +90,28 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
 
-#packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+echo 
+echo "The ovs reconfig done:"
+echo "ifcfg-"$natnetif
+echo "ifcfg-br-ex"
+echo "/etc/resolv.conf"
+echo "latest_packstack.conf"
+echo "keystonerc-*"
+echo 
+echo "next action:"
+echo "1 - power off this vm"
+echo "2 - create new NAT Network interface NatNetwork1 in virtualbox for $natnetip, no DHCP"
+echo "3 - add port forwarding to $natnetip:"
+echo "127.0.0.1:2222 to $natnetip:22"
+echo "127.0.0.1:8080 to $natnetip:80"
+echo "4 - in vm setting, change adapter setting:"
+echo "Attached to: NAT Network, Name: NatNetwork1"
+echo "Adapter Type: Paravirtualized Network (virtio-net)" 
+echo "Promiscuous Mode: Allow All"
+echo "5 - power on vm, ssh to vm to check networking setting as expected"
+echo "6 - run packstack to update change:"
+echo "sudo packstack --answer-file latest_packstack.conf"
+
+
 
 
