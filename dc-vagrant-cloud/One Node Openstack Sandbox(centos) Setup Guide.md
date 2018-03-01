@@ -1,5 +1,5 @@
 
-# One Node One NIC Openstack Sandbox(centos) Setup Guide
+# One Node Openstack Sandbox(centos) Setup Guide
 
 ## virtulabox vm node
 - centOS based vm
