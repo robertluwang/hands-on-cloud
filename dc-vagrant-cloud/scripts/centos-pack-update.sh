@@ -94,19 +94,3 @@ echo "Promiscuous Mode: Allow All"
 echo "4 - power on vm"
 echo "5 - dashboard url: http://$osip/dashboard"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
