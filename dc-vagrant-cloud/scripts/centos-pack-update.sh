@@ -83,14 +83,3 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/
 cp /root/keystonerc_* /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
-echo
-echo "next action:"
-echo "1 - power off this vm"
-echo "2 - create new or use existig NAT Network interface in virtualbox for $osip, no DHCP"
-echo "3 - in vm setting, change adapter setting:"
-echo "Attached to: NAT Network, Name: NatNetworkx"
-echo "Adapter Type: Paravirtualized Network (virtio-net)" 
-echo "Promiscuous Mode: Allow All"
-echo "4 - power on vm"
-echo "5 - dashboard url: http://$osip/dashboard"
-
