@@ -13,7 +13,7 @@ Also I created this [centos7 openstack sandbox box](https://app.vagrantup.com/dr
 
 ## use vagrant to launch openstack sandbox
 ```
-$ mkdir vagrant/ossandbox1
+$ mkdir vagrant/ctosbox1
 $ curl -Lo Vagrantfile 
 https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/ctopenstack/Vagrantfile.ct7osbox
 $ vagrant up 
