@@ -47,7 +47,7 @@ Promiscuous Mode: Allow All
 sudo packstack --answer-file latest_packstack.conf
 ```
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack1.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack1.jpg" alt="" width="800" />
 
 ## openstack sandbox vm access
 you can use any ssh client to access to openstack vm, for example putty.
@@ -152,9 +152,9 @@ export OS_IDENTITY_API_VERSION=3
 - Subnet: lab_pubsub, 172.25.250.0/24, gateway: 172.25.250.1
 - Subnet details: no DCHP, 172.25.250.26 to 172.25.250.99, dns: 172.25.250.1, 8.8.8.8
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack2.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack2.jpg" alt="" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack3.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack3.jpg" alt="" width="800" />
 
 ## create new image
 - as admin
@@ -162,13 +162,13 @@ export OS_IDENTITY_API_VERSION=3
 - Admin/Compute/Images: create image cirros as QCOW2 format,12MB
 - Admin/Compute/Images: create image fedora as QCOW2 format,220MB
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack7.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack7.jpg" alt="" width="800" />
 
 ## create new flavor for fedora
 - as admin
 - Admin/Compute/Flavors/Create Flavor: m2.small, 1 vcpu, 512M RAM, 5G Root Disk, 1024M swap disk
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack8.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack8.jpg" alt="" width="800" />
 
 ## create new private network
 - as admin
@@ -177,24 +177,24 @@ export OS_IDENTITY_API_VERSION=3
 - Subnet: lab_privsub, 192.168.10.0/24, gateway: 192.168.10.1
 - Subnet details: DHCP, 192.168.10.30 to 192.168.10.50, dns: 172.25.250.1, 8.8.8.8
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack4.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack4.jpg" alt="" width="800" />
 
 ## create router
 - as lab_user
 - Network/Routers: lab_router with lab_pubnet
 - add interface: 192.168.10.0/24, gateway 192.168.10.1 added
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack6.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack6.jpg" alt="" width="800" />
 
 Network Topology
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack9.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack9.jpg" alt="" width="800" />
 
 ## create new security group
 - as lab_user
 - Network/Security Groups: lab_sg
 - add rule to lab_sg: ICMP,SSH,FTP(TCP 20,21), HTTP for ingress IPv4
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack5.jpg" alt="" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/02/1nic-packstack5.jpg" alt="" width="800" />
 
 ## create new keypair
 - as lab_user
