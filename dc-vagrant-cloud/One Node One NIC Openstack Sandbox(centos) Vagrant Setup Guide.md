@@ -67,9 +67,9 @@ tips to install private key in putty:
 - in putty/SSH/Auth, select vagrant.ppk for private key file for auth.
 ```
 - dashboard GUI
-
+```
 http://localhost:8080
-
+```
 ## verify NAT Network OVS setting
 ```
 [vagrant@ctosbox1 ~]$ sudo cat ifcfg-eth0
