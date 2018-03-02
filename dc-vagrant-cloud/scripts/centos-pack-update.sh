@@ -69,17 +69,19 @@ $CONFIGSET CONFIG_MARIADB_HOST $osip
 $CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$osip
 $CONFIGSET CONFIG_REDIS_HOST $osip
 
-$CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1000:2000
 $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$ovsif
 
 # update source file
 
-packstack --answer-file latest_packstack.conf || echo "packstack exited $? and is suppressed."
+packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
-cp /root/keystonerc_* /home/vagrant/
-chown vagrant:vagrant /home/vagrant/keystonerc*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/$USER/keystonerc_*
+cp /root/keystonerc_* /home/$USER
+chown $USER:$USER ~/keystonerc*
+
+
+
 
 
 
