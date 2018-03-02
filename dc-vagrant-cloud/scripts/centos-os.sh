@@ -68,16 +68,7 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
 packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/$USER/keystonerc_*
-cp /root/keystonerc_* /home/$USER
-chown $USER:$USER ~/keystonerc*
-
-
-
-
-
-
-
-
-
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+cp /root/keystonerc_* /home/vagrant
+chown vagrant:vagrant ~/keystonerc*
 
