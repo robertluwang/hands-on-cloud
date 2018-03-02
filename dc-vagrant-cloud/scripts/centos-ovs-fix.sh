@@ -43,6 +43,7 @@ cp /tmp/ifcfg-$natnetif /etc/sysconfig/network-scripts
 
 # generate ifcfg-br-ex
 gw=`echo $natnetip|cut -d. -f1,2,3`.1
+net=`echo $natnetip|cut -d. -f1,2,3`.0
 
 cat <<EOF > /tmp/ifcfg-br-ex
 ONBOOT="yes"
@@ -106,7 +107,7 @@ echo "keystonerc-*"
 echo 
 echo "next action:"
 echo "1 - power off this vm"
-echo "2 - create new or use existing NAT Network interface in virtualbox for $natnetip, no DHCP"
+echo "2 - create new or use existing NAT Network interface in virtualbox for $net/24, no DHCP"
 echo "3 - add port forwarding to $natnetip:"
 echo "127.0.0.1:2222 to $natnetip:22"
 echo "127.0.0.1:8080 to $natnetip:80"
