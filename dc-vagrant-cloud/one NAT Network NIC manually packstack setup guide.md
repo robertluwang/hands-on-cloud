@@ -61,7 +61,7 @@ yum -y update
 reboot
 ```
 ## install RDO
-install RDO repo,
+install RDO following up [guide](https://www.rdoproject.org/install/packstack/).
 ```
 [root@centos7 ~]$ yum install -y https://rdoproject.org/repos/rdo-release.rpm
 Loaded plugins: fastestmirror
