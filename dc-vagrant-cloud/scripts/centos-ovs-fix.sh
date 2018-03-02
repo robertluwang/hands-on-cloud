@@ -79,7 +79,6 @@ $CONFIGSET CONFIG_MARIADB_HOST $natnetip
 $CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$natnetip
 $CONFIGSET CONFIG_REDIS_HOST $natnetip
 
-$CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1000:2000
 $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$natnetif
 
 sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf 
@@ -87,9 +86,9 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 # update source file
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
-cp /root/keystonerc_* /home/vagrant/
-chown vagrant:vagrant /home/vagrant/keystonerc*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/$USER/keystonerc_*
+cp /root/keystonerc_* /home/$USER
+chown $USER:$USER ~/keystonerc*
 
 echo 
 echo "The ovs reconfig done:"
