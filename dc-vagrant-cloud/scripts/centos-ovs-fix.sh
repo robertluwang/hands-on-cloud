@@ -1,78 +1,118 @@
 #!/bin/bash
-#  centos openstack with packstack provision script for packer  
-#  Robert Wang
-#  Feb 25th, 2018
+# centos-ovs-fix.sh
+# NAT Network openstack ovs fix script
+# Robert Wang @github.com/robertluwang
+# Feb 28th, 2018
+# $1 - NAT Network NIC interface, such as eth0
+# $2 - NAT Network NIC ip address, such as 172.25.250.10
 
 set -x
 
-# presetup
-systemctl disable firewalld
-systemctl stop firewalld
-systemctl disable NetworkManager
-systemctl stop NetworkManager
-systemctl enable network
-systemctl start network
+if [ -z "$1" ] && [ -z "$2" ];then
+    exit 0 
+else 
+    natnetif=$1
+    natnetip=$2
+fi
 
-# sw repo
-yum install -y centos-release-openstack-pike
-yum update -y 
-
-# install openvswitch
-
-yum install -y openvswitch
-systemctl start openvswitch
-
-# install packstack
-yum install -y openstack-packstack
-yum install -y openstack-utils
-
-# run packstack
-packstack --gen-answer-file=packstack_`date +"%Y-%m-%d"`.conf
-cp packstack_`date +"%Y-%m-%d"`.conf latest_packstack.conf
-
+# check interface ifcfg-xxx
 natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
-natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
 
-osif=$natif
-osip=$natip
+rm /etc/sysconfig/network-scripts/ifcfg-$natif 
+rm /etc/sysconfig/network-scripts/ifcfg-br-ex 
+
+# ovs config 
+
+# generate new interface file
+cat <<EOF > /tmp/ifcfg-$natnetif
+DEVICE=$natnetif
+NAME=$natnetif
+ONBOOT=yes
+TYPE=OVSPort
+DEVICETYPE=ovs
+OVS_BRIDGE=br-ex
+EOF
+
+cp /tmp/ifcfg-$natnetif /etc/sysconfig/network-scripts
+
+# generate ifcfg-br-ex
+gw=`echo $natnetip|cut -d. -f1,2,3`.1
+
+cat <<EOF > /tmp/ifcfg-br-ex
+ONBOOT="yes"
+NETBOOT="yes"
+IPADDR=$natnetip
+NETMASK=255.255.255.0
+GATEWAY=$gw
+DNS1=$gw
+DNS2=8.8.8.8
+DEVICE=br-ex
+NAME=br-ex
+DEVICETYPE=ovs
+OVSBOOTPROTO="static"
+TYPE=OVSBridge
+OVS_EXTRA="set bridge br-ex fail_mode=standalone"
+EOF
+
+cp /tmp/ifcfg-br-ex /etc/sysconfig/network-scripts
+
+# update /etc/resolv.conf
+
+sed -i '/nameserver/d' /etc/resolv.conf
+sed -i "$ a nameserver    $gw" /etc/resolv.conf
+sed -i "$ a nameserver    8.8.8.8" /etc/resolv.conf
+
+# update latest_packstack.conf
 
 CONFIGSET="openstack-config --set latest_packstack.conf general "
 CONFIGGET="openstack-config --get latest_packstack.conf general "
 
-# update /etc/hosts
+ipconf=`$CONFIGGET CONFIG_CONTROLLER_HOST`
 
-sed -i  "/localhost/d" /etc/hosts
-sed -i  "/127.0.0.1/d" /etc/hosts
-sed -i  "/$osip/d" /etc/hosts
-
-echo "127.0.0.1    lo localhost" | sudo tee -a /etc/hosts
-echo "$osip    "`hostname` |sudo tee -a /etc/hosts
-
-$CONFIGSET CONFIG_CONTROLLER_HOST $osip
-$CONFIGSET CONFIG_COMPUTE_HOSTS $osip
-$CONFIGSET CONFIG_NETWORK_HOSTS $osip
-$CONFIGSET CONFIG_STORAGE_HOST $osip
-$CONFIGSET CONFIG_SAHARA_HOST $osip
-$CONFIGSET CONFIG_AMQP_HOST $osip
-$CONFIGSET CONFIG_MARIADB_HOST $osip
-$CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$osip
-$CONFIGSET CONFIG_REDIS_HOST $osip
-
-$CONFIGSET CONFIG_DEFAULT_PASSWORD demo
-$CONFIGSET CONFIG_KEYSTONE_ADMIN_PW demo
-$CONFIGSET CONFIG_PROVISION_DEMO n
-$CONFIGSET CONFIG_CINDER_INSTALL n
-$CONFIGSET CONFIG_SWIFT_INSTALL n
-$CONFIGSET CONFIG_CEILOMETER_INSTALL n
-$CONFIGSET CONFIG_NAGIOS_INSTALL n
+$CONFIGSET CONFIG_CONTROLLER_HOST $natnetip
+$CONFIGSET CONFIG_COMPUTE_HOSTS $natnetip
+$CONFIGSET CONFIG_NETWORK_HOSTS $natnetip
+$CONFIGSET CONFIG_STORAGE_HOST $natnetip
+$CONFIGSET CONFIG_SAHARA_HOST $natnetip
+$CONFIGSET CONFIG_AMQP_HOST $natnetip
+$CONFIGSET CONFIG_MARIADB_HOST $natnetip
+$CONFIGSET CONFIG_KEYSTONE_LDAP_URL ldap://$natnetip
+$CONFIGSET CONFIG_REDIS_HOST $natnetip
 
 $CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1000:2000
-$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
+$CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$natnetif
 
-packstack --answer-file latest_packstack.conf  || echo "packstack exited $? and is suppressed."
+sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf 
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+# update source file
+
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant/
 chown vagrant:vagrant /home/vagrant/keystonerc*
+
+echo 
+echo "The ovs reconfig done:"
+echo "ifcfg-"$natnetif
+echo "ifcfg-br-ex"
+echo "/etc/resolv.conf"
+echo "latest_packstack.conf"
+echo "keystonerc-*"
+echo 
+echo "next action:"
+echo "1 - power off this vm"
+echo "2 - create new or use existig NAT Network interface in virtualbox for $natnetip, no DHCP"
+echo "3 - add port forwarding to $natnetip:"
+echo "127.0.0.1:2222 to $natnetip:22"
+echo "127.0.0.1:8080 to $natnetip:80"
+echo "4 - in vm setting, change adapter setting:"
+echo "Attached to: NAT Network, Name: NatNetworkx"
+echo "Adapter Type: Paravirtualized Network (virtio-net)" 
+echo "Promiscuous Mode: Allow All"
+echo "5 - power on vm, ssh to vm to check networking setting as expected"
+echo "6 - run packstack to update change:"
+echo "sudo packstack --answer-file latest_packstack.conf"
+echo
+
+
 
