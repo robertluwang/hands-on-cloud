@@ -98,7 +98,7 @@ OVS_EXTRA="set bridge br-ex fail_mode=standalone"
 ```
 ip addr
 
-[code]
+```
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast master ovs-system state UP qlen 1000
     link/ether 08:00:27:b4:a5:ff brd ff:ff:ff:ff:ff:ff
     inet6 fe80::a00:27ff:feb4:a5ff/64 scope link
@@ -110,7 +110,7 @@ ip addr
        valid_lft forever preferred_lft forever
     inet6 fe80::a00:27ff:feb4:a5ff/64 scope link
        valid_lft forever preferred_lft forever
-[/code]
+```
 
 ## verify routing table
 ```
