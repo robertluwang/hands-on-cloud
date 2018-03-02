@@ -81,7 +81,7 @@ OVS_BRIDGE=br-ex
 ONBOOT=yes
 BOOTPROTO=none
 ```
-also ifcfg-br-ex as below,
+ifcfg-br-ex as below,
 ```
 [vagrant@ctosbox1 ~]$ sudo cat ifcfg-br-ex
 ONBOOT="yes"
