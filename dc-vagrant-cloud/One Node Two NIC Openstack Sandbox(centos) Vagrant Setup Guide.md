@@ -175,11 +175,11 @@ export OS_IDENTITY_API_VERSION=3
 - Subnet: lab_pubsub, 172.25.250.0/24, gateway: 10.0.2.2
 - Subnet details: no DCHP, 172.25.250.26 to 172.25.250.99, dns: 10.0.2.3, 8.8.8.8
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack1.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack1.jpg" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack2.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack2.jpg" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack3.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack3.jpg" width="800" />
 
 ## create new image
 - as admin
@@ -198,24 +198,24 @@ export OS_IDENTITY_API_VERSION=3
 - Subnet: lab_privsub, 192.168.10.0/24, gateway: 192.168.10.1
 - Subnet details: DHCP, 192.168.10.30 to 192.168.10.50, dns: 10.0.2.3, 8.8.8.8
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack4.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack4.jpg" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack6.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack6.jpg" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack7.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack7.jpg" width="800" />
 
 ## create router
 - as lab_user
 - Network/Routers: lab_router with lab_pubnet
 - add interface: 192.168.10.0/24, gateway 192.168.10.25 added
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack8.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack8.jpg" width="800" />
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack9.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack9.jpg" width="800" />
 
 Network Topology
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack10.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack10.jpg" width="800" />
 
 ## create new security group
 - as lab_user
@@ -227,7 +227,7 @@ Network Topology
 - Compute/Key Pairs
 - save private key to vagrant ~/.ssh/lab-key.pem, chmod 600 lab-key.pem
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack5.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack5.jpg" width="800" />
 
 ## create new cirros instance
 - as lab_user
@@ -235,7 +235,7 @@ Network Topology
 - vm assigned private ip 192.168.10.32
 - associate floating ip 172.25.250.34
 
-<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack11.jpg" width="600" />
+<img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack11.jpg" width="800" />
 
 ## verify from CLI
 ```
