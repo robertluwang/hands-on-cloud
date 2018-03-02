@@ -128,7 +128,7 @@ Destination Gateway Genmask Flags MSS Window irtt Iface
 
 ## create source file for lab_user
 
-[code]
+```
 [vagrant@ctosbox1 ~]$ cat keystonerc_user
 unset OS_SERVICE_TOKEN
     export OS_USERNAME=lab_user
@@ -140,7 +140,7 @@ export OS_PROJECT_NAME=lab_project
 export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
 export OS_IDENTITY_API_VERSION=3
-[/code]
+```
 
 [vagrant@ctosbox1 ~]$ source keystonerc_user
 
@@ -207,20 +207,20 @@ Network Topology
 
 ## verify from CLI
 
-[code]
+```
 [vagrant@ctosbox1 ~(keystone_lab_user)]$ nova list
 +--------------------------------------+------------+--------+------------+-------------+------------------------------------------+
 | ID                                   | Name       | Status | Task State | Power State | Networks                                 |
 +--------------------------------------+------------+--------+------------+-------------+------------------------------------------+
 | 10ef337a-8e79-49c5-be67-fc6c997f61fe | cirros-vm1 | ACTIVE | -          | Running     | lab_privnet=192.168.10.32, 172.25.250.26 |
 +--------------------------------------+------------+--------+------------+-------------+------------------------------------------+
-[/code]
+```
 
 ## namespace netns test for cirros vm
 
 we can ping floating ip but not private ip, this is expected,
 
-[code]
+```
 [vagrant@ctosbox1 ~(keystone_lab_user)]$ nova list
 +--------------------------------------+------------+--------+------------+-------------+------------------------------------------+
 | ID                                   | Name       | Status | Task State | Power State | Networks                                 |
@@ -241,7 +241,7 @@ PING 172.25.250.26 (172.25.250.26) 56(84) bytes of data.
 --- 172.25.250.26 ping statistics ---
 2 packets transmitted, 2 received, 0% packet loss, time 1001ms
 rtt min/avg/max/mdev = 0.458/1.673/2.888/1.215 ms
-[/code]
+```
 
 we can access both private ip/floating ip inside router netns,
 ```
@@ -268,7 +268,7 @@ rtt min/avg/max/mdev = 0.446/0.722/0.999/0.277 ms
 ## ssh to cirros vm in netns
 cirros vm can access to Internet,
 
-[code]
+```
 [vagrant@ctosbox1 ~(keystone_lab_user)]$ ssh -i /home/vagrant/.ssh/lab-key.pem cirros@172.25.250.26
 The authenticity of host '172.25.250.26 (172.25.250.26)' can't be established.
 ECDSA key fingerprint is SHA256:2KA5eRDiNSHe7fP/BeVzDw1Xs6QIyaakWx0gHlGeMI4.
@@ -284,4 +284,4 @@ nameserver 8.8.8.8
 $ ping google.ca
 PING google.ca (172.217.9.131): 56 data bytes
 64 bytes from 172.217.9.131: seq=0 ttl=47 time=45.266 ms
-[/code]
+```
