@@ -5,6 +5,7 @@
 # Feb 28th, 2018
 # $1 - NAT Network NIC interface, such as eth0
 # $2 - NAT Network NIC ip address, such as 172.25.250.10
+# $3 - sudo user, default vagrant
 
 set -x
 
@@ -13,6 +14,11 @@ if [ -z "$1" ] && [ -z "$2" ];then
 else 
     natnetif=$1
     natnetip=$2
+    if [ -z "$3" ];then
+        sduser="vagrant"
+    else
+        sduser=$3
+    fi
 fi
 
 # check interface ifcfg-xxx
@@ -86,9 +92,9 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 # update source file
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/$USER/keystonerc_*
-cp /root/keystonerc_* /home/$USER
-chown $USER:$USER ~/keystonerc*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/$sduser/keystonerc_*
+cp /root/keystonerc_* /home/$sduser
+chown $sduser:$sduer /home/$sduser/keystonerc*
 
 echo 
 echo "The ovs reconfig done:"
@@ -112,6 +118,8 @@ echo "5 - power on vm, ssh to vm to check networking setting as expected"
 echo "6 - run packstack to update change:"
 echo "sudo packstack --answer-file latest_packstack.conf"
 echo
+
+
 
 
 
