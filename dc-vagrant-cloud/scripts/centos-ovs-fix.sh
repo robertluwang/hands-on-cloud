@@ -97,6 +97,8 @@ sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /h
 cp /root/keystonerc_* /home/$sduser
 chown $sduser:$sduer /home/$sduser/keystonerc*
 
+systemctl restart network
+
 echo 
 echo "The ovs reconfig done:"
 echo "ifcfg-"$natnetif
