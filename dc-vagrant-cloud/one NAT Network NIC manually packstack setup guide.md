@@ -471,22 +471,6 @@ export OS_IDENTITY_API_VERSION=3
 - vm assigned private ip 192.168.10.35
 - associate floating ip 172.25.250.34
 
-## source file for lab_user
-```
-[root@centos7 ~(keystone_lab_user)]# cat keystonerc_user
-unset OS_SERVICE_TOKEN
-    export OS_USERNAME=lab_user
-    export OS_PASSWORD='redhat'
-    export OS_AUTH_URL=http://172.25.250.10:5000/v3
-    export PS1='[\u@\h \W(keystone_lab_user)]\$ '
-
-export OS_PROJECT_NAME=lab_project
-export OS_USER_DOMAIN_NAME=Default
-export OS_PROJECT_DOMAIN_NAME=Default
-export OS_IDENTITY_API_VERSION=3
-
-[root@centos7 ~]# source keystonerc_user
-```
 ## openstack CLI 
 ```
 [root@centos7dev ~(keystone_lab_user)]# nova list
