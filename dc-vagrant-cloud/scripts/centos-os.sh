@@ -5,7 +5,7 @@
 
 set -x
 
-# step0 presetup
+# presetup
 systemctl disable firewalld
 systemctl stop firewalld
 systemctl disable NetworkManager
@@ -13,15 +13,20 @@ systemctl stop NetworkManager
 systemctl enable network
 systemctl start network
 
-# step 1 sw repo
+# sw repo
 yum install -y centos-release-openstack-pike
-yum install -y openstack-utils
-yum update -y
+yum update -y 
 
-# step 2 install packstack
+# install openvswitch
+
+yum install -y openvswitch
+systemctl start openvswitch
+
+# install packstack
 yum install -y openstack-packstack
+yum install -y openstack-utils
 
-# step3 run packstack
+# run packstack
 packstack --gen-answer-file=packstack_`date +"%Y-%m-%d"`.conf
 cp packstack_`date +"%Y-%m-%d"`.conf latest_packstack.conf
 
@@ -56,23 +61,20 @@ $CONFIGSET CONFIG_REDIS_HOST $osip
 $CONFIGSET CONFIG_DEFAULT_PASSWORD demo
 $CONFIGSET CONFIG_KEYSTONE_ADMIN_PW demo
 $CONFIGSET CONFIG_PROVISION_DEMO n
-$CONFIGSET CONFIG_CINDER_INSTALL n
-$CONFIGSET CONFIG_SWIFT_INSTALL n
-$CONFIGSET CONFIG_CEILOMETER_INSTALL n
-$CONFIGSET CONFIG_NAGIOS_INSTALL n
 
-$CONFIGSET CONFIG_NOVA_COMPUTE_PRIVIF lo
-$CONFIGSET CONFIG_NOVA_NETWORK_PRIVIF lo
-
+$CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1000:2000
 $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
 
-packstack --answer-file latest_packstack.conf  || echo "packstack exited $? and is suppressed."
+packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_admin
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/$USER/keystonerc_*
+cp /root/keystonerc_* /home/$USER
+chown $USER:$USER ~/keystonerc*
 
-rm /home/vagrant/keystonerc_admin
-cp /root/keystonerc_admin /home/vagrant/
-chown vagrant:vagrant /home/vagrant/keystonerc*
+
+
+
 
 
 
