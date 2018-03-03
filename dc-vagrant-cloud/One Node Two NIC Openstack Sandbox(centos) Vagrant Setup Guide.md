@@ -3,8 +3,8 @@
 - memory: 4-6GB
 - CPU: 2
 - HD: 50G
-- NIC1: NAT default 10.0.2.15, dhcp,Internet access, ovs br-ex
-- NIC2: Hostonly, static ip, for example 172.25.250.20, openstack management ip, same network for openstack public network 172.25.250.0/24
+- NIC1: NAT default 10.0.2.15, dhcp, for Internet access, ovs br-ex
+- NIC2: Hostonly, static ip, 172.25.250.1, for openstack management/public network 172.25.250.0/24
 - opensatck vm user/pass: vagrant/vagrant
 - openstack admin user/pass: admin/demo
 
