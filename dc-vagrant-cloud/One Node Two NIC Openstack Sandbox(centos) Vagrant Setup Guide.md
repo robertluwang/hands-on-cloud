@@ -15,7 +15,7 @@ $ curl -Lo Vagrantfile
 https://raw.githubusercontent.com/robertluwang/cloud-hands-on-guide/master/dc-vagrant-cloud/ctopenstack/Vagrantfile.ct7osbox2
 $ vagrant up
 ```
-Now the openstack sandbox vm is ready, no extra setup needed.
+in Virtualbox GUI, need to make sure Adapter2 Host-only changed to 172.25.250.1, no DHCP, then you boot up vm box.
 
 ## ssh to openstack sandbox vm
 - use user/password:
