@@ -66,6 +66,14 @@ tips to install private key in putty:
 - run puttygen, load the vagrant key file, then save private key to vagrant.ppk.
 - in putty/SSH/Auth, select vagrant.ppk for private key file for auth.
 ```
+
+sidenote:
+sometimes cannot access to sandbox vm directly, can login from vm console, very if can ping gateway ip which is 172.25.250.1, most of chance you cannot ping, the remedy is to restart network service,
+```
+sudo systemctl restart network
+```
+when ping 172.25.250.1 is ok then outside ssh access will work.
+
 - dashboard GUI
 ```
 http://localhost:8080
