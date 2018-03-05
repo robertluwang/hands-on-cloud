@@ -68,6 +68,7 @@ tips to install private key in putty:
 ```
 
 - sidenote
+
 sometimes if you cannot access to sandbox vm directly,login from vm console, verify if can ping gateway ip which is 172.25.250.1, most of chance you cannot ping, the remedy is to restart network service,
 ```
 sudo systemctl restart network
