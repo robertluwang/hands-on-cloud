@@ -77,6 +77,8 @@ packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack 
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+sed  -i "s/^[ \t]*//" /root/keystonerc_*
+sed  -i "s/^[ \t]*//" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant
 chown vagrant:vagrant /home/vagrant/keystonerc*
 
