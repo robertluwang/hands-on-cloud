@@ -94,6 +94,8 @@ sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/$sduser/keystonerc_*
+sed  -i "s/^[ \t]*//" /root/keystonerc_*
+sed  -i "s/^[ \t]*//" /home/$sduser/keystonerc_*
 cp /root/keystonerc_* /home/$sduser
 chown $sduser:$sduer /home/$sduser/keystonerc*
 
