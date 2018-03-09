@@ -39,9 +39,9 @@ nova quota-update 3985ea75b1ba481cb8399435a2cd2ee1 --key-pairs 3
 ### create public network admin cli
 openstack network cli
 ```
-openstack network create public --project admin  --provider-network-type flat --provider-physical-network extnet --external
+openstack network create public --project admin --provider-network-type flat --provider-physical-network extnet --external
 
-openstack subnet create pubsub --project admin --allocation-pool start=172.25.250.30,end=172.25.250.50  --network public --subnet-range 172.25.250.0/24 --no-dhcp --gateway 10.0.2.2 --dns-nameserver 10.0.2.3 --dns-nameserver 8.8.8.8
+openstack subnet create pubsub --project admin --allocation-pool start=172.25.250.30,end=172.25.250.50 --network public --subnet-range 172.25.250.0/24 --no-dhcp --gateway 10.0.2.2 --dns-nameserver 10.0.2.3 --dns-nameserver 8.8.8.8
 ```
 ### create private network as admin cli
 openstack network cli
