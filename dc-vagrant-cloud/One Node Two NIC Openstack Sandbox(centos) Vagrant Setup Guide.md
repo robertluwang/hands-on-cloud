@@ -143,13 +143,6 @@ PING google.ca (172.217.0.99) 56(84) bytes of data.
 - go to Identity
 - create project: lab_project
 - create user: lab_user with lab_project, password: demo
-```
-[vagrant@ctosbox2 .ssh]$ chmod 600 lab-key.pem
-[vagrant@ctosbox2 .ssh]$ ls -ltr
-total 8
--rw-------. 1 vagrant root 409 Mar 2 16:23 authorized_keys
--rw-------. 1 vagrant vagrant 1676 Mar 2 18:45 lab-key.pem
-```
 
 ## create source file for lab_user
 
@@ -226,6 +219,13 @@ Network Topology
 - as lab_user
 - Compute/Key Pairs
 - save private key to vagrant ~/.ssh/lab-key.pem, chmod 600 lab-key.pem
+```
+[vagrant@ctosbox2 .ssh]$ chmod 600 lab-key.pem
+[vagrant@ctosbox2 .ssh]$ ls -ltr
+total 8
+-rw-------. 1 vagrant root 409 Mar 2 16:23 authorized_keys
+-rw-------. 1 vagrant vagrant 1676 Mar 2 18:45 lab-key.pem
+```
 
 <img src="http://dreamcloud.artark.ca/wp-content/uploads/2018/03/2nic-packstack5.jpg" width="800" />
 
