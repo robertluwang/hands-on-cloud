@@ -1,7 +1,7 @@
 {
     "variables": {
-        "repo_user": "robert.wang",
-        "repo_pass": "g0g01826",
+        "repo_user": "username",
+        "repo_pass": "password",
         "vm_name": "rhelos10",
         "iso_url": "../../iso/rhel-server-7.3-x86_64-dvd.iso",
         "iso_sha256": "120acbca7b3d55465eb9f8ef53ad7365f2997d42d4f83d7cc285bf5c71e1131f"
