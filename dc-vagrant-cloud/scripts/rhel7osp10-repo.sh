@@ -6,6 +6,9 @@
 # $1 - rhel dev account user
 # $2 - rhel dev account password
 subscription-manager register --username $1 --password $2 --auto-attach
+poolid=`subscription-manager list --available --all|grep "Pool ID"|awk -F: '{print $2}'`
+for id in $poolid; do subscription-manager attach --pool=$id; done  
+
 subscription-manager repos --disable=*
 subscription-manager repos --enable=rhel-7-server-rpms
 subscription-manager repos --enable=rhel-7-server-rh-common-rpms
