@@ -13,10 +13,6 @@ systemctl stop NetworkManager
 systemctl enable network
 systemctl start network
 
-# sw repo
-yum install -y centos-release-openstack-pike
-yum update -y 
-
 # install packstack
 yum install -y openstack-packstack
 yum install -y openstack-utils
