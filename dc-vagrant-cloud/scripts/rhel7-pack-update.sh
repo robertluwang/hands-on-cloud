@@ -3,7 +3,6 @@
 # rhel7 base openstack box packstack ip update script for packer
 # Robert Wang @github.com/robertluwang
 # Sept 24th, 2018
-# $1 - compute1 ip
 
 set -x
 
@@ -58,14 +57,7 @@ echo "$osip    "`hostname` |sudo tee -a /etc/hosts
 # update latest_packstack.conf
 
 $CONFIGSET CONFIG_CONTROLLER_HOST $osip
-
-if [ -z "$1" ] ;then
-    $CONFIGSET CONFIG_COMPUTE_HOSTS $osip   
-else 
-    $CONFIGSET CONFIG_COMPUTE_HOSTS $osip,$1
-    echo "$1    compute1" |sudo tee -a /etc/hosts
-fi
-
+$CONFIGSET CONFIG_COMPUTE_HOSTS $osip   
 $CONFIGSET CONFIG_NETWORK_HOSTS $osip
 $CONFIGSET CONFIG_STORAGE_HOST $osip
 $CONFIGSET CONFIG_SAHARA_HOST $osip
