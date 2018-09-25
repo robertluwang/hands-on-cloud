@@ -5,8 +5,7 @@
 # Sept 24th, 2018
 # $1 - NAT Network NIC interface, such as enp0s3
 # $2 - NAT Network NIC ip address, such as 188.28.88.10
-# $3 - compute1 ip such as 188.28.88.12
-# $4 - sudo user, default vagrant
+# $3 - sudo user, default vagrant
 
 set -x
 
@@ -16,10 +15,10 @@ else
     natnetif=$1
     natnetip=$2
 
-    if [ -z "$4" ];then
+    if [ -z "$3" ];then
         sduser="vagrant"
     else
-        sduser=$4
+        sduser=$3
     fi
 fi
 
@@ -79,14 +78,7 @@ CONFIGGET="openstack-config --get latest_packstack.conf general "
 ipconf=`$CONFIGGET CONFIG_CONTROLLER_HOST`
 
 $CONFIGSET CONFIG_CONTROLLER_HOST $natnetip
-
-if [ -z "$3" ] ;then
-    $CONFIGSET CONFIG_COMPUTE_HOSTS $natnetip   
-else 
-    $CONFIGSET CONFIG_COMPUTE_HOSTS $natnetip,$3
-    echo "$3    compute1" |sudo tee -a /etc/hosts
-fi
-
+$CONFIGSET CONFIG_COMPUTE_HOSTS $natnetip   
 $CONFIGSET CONFIG_NETWORK_HOSTS $natnetip
 $CONFIGSET CONFIG_STORAGE_HOST $natnetip
 $CONFIGSET CONFIG_SAHARA_HOST $natnetip
