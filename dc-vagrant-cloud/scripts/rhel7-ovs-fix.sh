@@ -1,6 +1,6 @@
 #!/bin/bash
 # rhel7-ovs-fix.sh
-# NAT Network openstack ovs fix script
+# NAT Network openstack ovs fix script for one node one NIC solution
 # Robert Wang @github.com/robertluwang
 # Sept 24th, 2018
 # $1 - NAT Network NIC interface, such as enp0s3
