@@ -62,7 +62,6 @@ if [ -z "$1" ] ;then
     $CONFIGSET CONFIG_COMPUTE_HOSTS $osip   
 else 
     $CONFIGSET CONFIG_COMPUTE_HOSTS $osip,$1
-    echo "$1    compute1" |sudo tee -a /etc/hosts
 fi  
 $CONFIGSET CONFIG_NETWORK_HOSTS $osip
 $CONFIGSET CONFIG_STORAGE_HOST $osip
