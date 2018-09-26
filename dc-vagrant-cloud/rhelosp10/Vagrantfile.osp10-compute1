@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
         vm2.vm.provider :virtualbox do |vb|                                      
             vb.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]       
             vb.name="osp10-compute1"                                                
-            vb.memory=1024 
+            vb.memory=2048 
             vb.cpus=1                                                       
         end                                                                      
     end                                                                          
