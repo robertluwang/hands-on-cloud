@@ -102,8 +102,11 @@ $CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key
 $CONFIGSET CONFIG_SSL_CERT_DIR /root/packstackca
 
 # update source file
-
-packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
+if [ -z "$1" ] ;then
+    packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."   
+else 
+    echo vagrant | packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
+fi 
 
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
 sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
