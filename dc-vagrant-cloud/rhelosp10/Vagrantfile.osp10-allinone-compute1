@@ -1,6 +1,8 @@
 # Vagrantfile
 # launch a rhel7.3 based openstack sandbox using rhel7osp10 box
 # need 2 nodes: one for allinone node and one for compute1 node, launch compute1 at first then launch this allinone node
+# allinone: 188.28.88.11
+# compute1: 188.28.88.12
 # By Robert Wang @github.com/robertluwang
 # Sept 25th, 2018
 
