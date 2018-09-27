@@ -107,8 +107,18 @@ else
     echo vagrant | packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
 fi 
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /root/keystonerc_*
+sed -i "/OS_PROJECT_DOMAIN_NAME/d" /root/keystonerc_*
+sed -i "/OS_IDENTITY_API_VERSION/d" /root/keystonerc_*
+sed -i "$ a export\ OS_PROJECT_DOMAIN_NAME=Default" /root/keystonerc_*
+sed -i "$ a export\ OS_IDENTITY_API_VERSION=3" /root/keystonerc_*
+
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$natnetip:5000/v3" /home/vagrant/keystonerc_*
+sed -i "/OS_PROJECT_DOMAIN_NAME/d" /home/vagrant/keystonerc_*
+sed -i "/OS_IDENTITY_API_VERSION/d" /home/vagrant/keystonerc_*
+sed -i "$ a export\ OS_PROJECT_DOMAIN_NAME=Default" /home/vagrant/keystonerc_*
+sed -i "$ a export\ OS_IDENTITY_API_VERSION=3" /home/vagrant/keystonerc_*
+
 sed  -i "s/^[ \t]*//" /root/keystonerc_*
 sed  -i "s/^[ \t]*//" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant
