@@ -14,8 +14,8 @@ systemctl enable network
 systemctl start network
 
 # install packstack
-yum install -y openstack-packstack
-yum install -y openstack-utils
+[[ `yum list installed|grep openstack-packstack` ]] || yum install -y openstack-packstack
+[[ `yum list installed|grep openstack-utils` ]] || yum install -y openstack-utils
 
 # run packstack
 packstack --gen-answer-file=packstack_`date +"%Y-%m-%d"`.conf
