@@ -10,7 +10,7 @@ systemctl stop NetworkManager
 systemctl enable network
 systemctl start network
 
-yum install -y openstack-utils
+[[ `yum list installed|grep openstack-utils` ]] || yum install -y openstack-utils 
 
 
 
