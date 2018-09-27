@@ -16,7 +16,6 @@ subscription-manager repos --enable=rhel-7-server-extras-rpms
 subscription-manager repos --enable=rhel-7-server-openstack-10-rpms
 subscription-manager repos --enable=rhel-7-server-openstack-10-devtools-rpms
 
-[[ `yum list installed |grep yum-utils` ]] || yum install -y yum-utils  
-[[ `yum list installed |grep deltarpm` ]] || yum install -y deltarpm
+yum install -y yum-utils  
 
 yum update -y 
