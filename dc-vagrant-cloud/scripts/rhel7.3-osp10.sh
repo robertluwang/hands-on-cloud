@@ -23,6 +23,9 @@ cp packstack_`date +"%Y-%m-%d"`.conf latest_packstack.conf
 
 natif=`ls -ltr /etc/sysconfig/network-scripts|grep ifcfg|grep -v ifcfg-lo|grep -v ifcfg-br-ex|awk '{print $9}'|cut -d\- -f2|sort|head -1`
 natip=`ip addr show $natif|grep $natif|grep global|awk '{print $2}'|cut -d/ -f1`
+if [ "$natip" = "" ];then
+        natip=`ip addr show br-ex|grep "global dynamic br-ex"|awk '{print $2}'|cut -d/ -f1`
+fi
 
 osif=$natif
 osip=$natip
