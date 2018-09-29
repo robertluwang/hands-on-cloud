@@ -79,12 +79,19 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$ovsif
 
 # update source file
 
-packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
-
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /home/vagrant/keystonerc_*
 sed  -i "s/^[ \t]*//" /root/keystonerc_*
 sed  -i "s/^[ \t]*//" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant
 chown vagrant:vagrant /home/vagrant/keystonerc*
-
+    
+if [ -z "$1" ] ;then
+    packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."   
+else 
+    echo
+    echo "packstack answer file latest_packstack.conf is updated for compute1 node "$1
+    echo make sure compute1 node is running and ssh to allinone node to run packstack manually as vagrant, 
+    echo sudo packstack --answer-file latest_packstack.conf --timeout=1800 
+    echo
+fi
