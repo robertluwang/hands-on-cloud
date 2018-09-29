@@ -112,8 +112,8 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$natnetif
 $CONFIGSET CONFIG_SSL_CACERT_SELFSIGN y
 $CONFIGSET CONFIG_AMQP_ENABLE_SSL y
 
-$CONFIGSET CONFIG_SSL_CACERT_FILE /etc/pki/tls/certs/localhost.crt
-$CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key 
+#$CONFIGSET CONFIG_SSL_CACERT_FILE /etc/pki/tls/certs/localhost.crt
+#$CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key 
 $CONFIGSET CONFIG_SSL_CERT_DIR /root/packstackca
 
 sed -i "s/$ipconf/$natnetip/g" latest_packstack.conf 
