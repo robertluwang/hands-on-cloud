@@ -77,8 +77,8 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
 $CONFIGSET CONFIG_SSL_CACERT_SELFSIGN y
 $CONFIGSET CONFIG_AMQP_ENABLE_SSL y
 
-$CONFIGSET CONFIG_SSL_CACERT_FILE /etc/pki/tls/certs/localhost.crt
-$CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key 
+#$CONFIGSET CONFIG_SSL_CACERT_FILE /etc/pki/tls/certs/localhost.crt
+#$CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key 
 $CONFIGSET CONFIG_SSL_CERT_DIR /root/packstackca
 
 packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
