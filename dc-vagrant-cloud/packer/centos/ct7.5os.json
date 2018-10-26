@@ -30,12 +30,12 @@
           "2"
         ]
       ],
-      "vm_name": "ct7os"
+      "vm_name": "ct7osrocky"
     }
   ],
   "post-processors": [
     {
-      "output": "{{.Provider}}-ct7os-vagrant-packer.box",
+      "output": "{{.Provider}}-ct7osrocky-vagrant-packer.box",
       "type": "vagrant"
     }
   ],
