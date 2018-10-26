@@ -1,7 +1,7 @@
 #!/bin/bash
 #  centos openstack with packstack provision script for packer  
 #  Robert Wang
-#  Feb 25th, 2018
+#  Oct 26th, 2018
 
 set -x
 
