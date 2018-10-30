@@ -83,8 +83,8 @@ $CONFIGSET CONFIG_AMQP_ENABLE_SSL y
 #$CONFIGSET CONFIG_SSL_CACERT_KEY_FILE /etc/pki/tls/private/localhost.key 
 $CONFIGSET CONFIG_SSL_CERT_DIR /root/packstackca
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /home/vagrant/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3/root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
 sed  -i "s/^[ \t]*//" /root/keystonerc_*
 sed  -i "s/^[ \t]*//" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant
