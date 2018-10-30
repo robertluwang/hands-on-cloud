@@ -93,8 +93,8 @@ $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$ovsif
 
 # update source file
 
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /root/keystonerc_*
-sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v2.0" /home/vagrant/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /root/keystonerc_*
+sed -i "/export\ OS_AUTH_URL=/c export\ OS_AUTH_URL=http://$osip:5000/v3" /home/vagrant/keystonerc_*
 sed  -i "s/^[ \t]*//" /root/keystonerc_*
 sed  -i "s/^[ \t]*//" /home/vagrant/keystonerc_*
 cp /root/keystonerc_* /home/vagrant
