@@ -1,7 +1,8 @@
 #!/bin/bash
 #  centos openstack with packstack provision script for packer  
 #  Robert Wang
-#  Feb 25th, 2018
+#  Oct 30th, 2018
+#  $1 - openstack version, default is rocky
 
 set -x
 
@@ -14,7 +15,12 @@ systemctl enable network
 systemctl start network
 
 # sw repo
-yum install -y centos-release-openstack-pike
+if [ -z "$1" ];
+then  
+    yum install -y centos-release-openstack-rocky
+else
+    yum install -y centos-release-openstack-$1
+fi
 yum update -y 
 
 # install openvswitch
@@ -76,9 +82,10 @@ $CONFIGSET CONFIG_HEAT_INSTALL y
 $CONFIGSET CONFIG_NEUTRON_L3_EXT_BRIDGE 
 $CONFIGSET CONFIG_NEUTRON_ML2_TYPE_DRIVERS flat,vxlan
 $CONFIGSET CONFIG_NEUTRON_ML2_VXLAN_GROUP 239.1.1.2
-$CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1:1000
+$CONFIGSET CONFIG_NEUTRON_ML2_VNI_RANGES 1000:2000
 $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_MAPPINGS physnet1:br-ex
 $CONFIGSET CONFIG_NEUTRON_OVS_BRIDGE_IFACES br-ex:$osif
+$CONFIGSET CONFIG_KEYSTONE_API_VERSION v3
 
 packstack --answer-file latest_packstack.conf --timeout=1800 || echo "packstack exited $? and is suppressed."
 
