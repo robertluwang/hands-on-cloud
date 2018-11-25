@@ -8,7 +8,7 @@
 
 You can build it from [centos 7 Minimal iso](http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso) manually, then followed [RDO packstack guide](https://www.rdoproject.org/install/packstack/) to install one node openstack manually.
 
-Please refer this [one NAT Network NIC manually packstack setup guide](https://github.com/robertluwang/cloud-hands-on-guide/blob/master/dc-vagrant-cloud/one%20NAT%20Network%20NIC%20manually%20packstack%20setup%20guide.md).
+Please refer this [one NAT Network NIC manually packstack setup guide](https://github.com/robertluwang/cloud-hands-on-guide/blob/master/one%20NAT%20Network%20NIC%20manually%20packstack%20setup%20guide.md).
 
 Also I created this [centos7 openstack sandbox box](https://app.vagrantup.com/dreamcloud/boxes/ct7os) to help you launch an openstack sandbox quickly using Vagrant.
 
