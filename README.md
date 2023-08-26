@@ -1,3 +1,3 @@
-# cloud-hands-on-guide
+# cloud hands-on guide
 
-Hands on guide for cloud.
+Hands-on guide for cloud.
